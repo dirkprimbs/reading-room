@@ -1161,6 +1161,11 @@ function sunTimes(now) {
   const day = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate());
   return { rise: day + (noon - H / 15) * 36e5, set: day + (noon + H / 15) * 36e5 };
 }
+// the moon's age as a fraction of the lunar month: 0 new, 0.25 first quarter, 0.5 full, 0.75 last quarter
+function moonAge(when) {
+  const NEW_MOON = Date.UTC(2000, 0, 6, 18, 14), MONTH = 29.530588853 * 864e5;
+  return (((when - NEW_MOON) % MONTH) + MONTH) % MONTH / MONTH;
+}
 function phaseAt(now, rise, set) {
   const w = 45 * 60e3;
   if (Math.abs(now - rise) <= w) return "dawn";
@@ -1540,6 +1545,8 @@ function applyLook() {
   const today = torontoToday(now);
   const t = m && m[3] ? { y: today.y, m: MONTHS.indexOf(m[3]) + 1, d: +(m[4] || 15) } : today;
   sky.month = t.m;
+  // tonight's moon, or the previewed date's at 10 pm Toronto time
+  sky.shown.moon = moonAge(m && m[3] ? Date.UTC(t.y, t.m - 1, t.d, 26) : now);
   const occasion = renderDecor(t);
   const base = m ? `Preview: ${[m[1] ? phase : "", m[2] || "", m[3] ? m[3] + " " + t.d : ""].filter(Boolean).join(", ")}` :
     sky.label ? `Toronto · ${sky.label}` : `Toronto · ${PHASE_WORD[phase]}`;
@@ -1812,12 +1819,23 @@ async function loadWeather() {
     }
     // sun or moon
     if (phase === "night") {
-      ctx.globalAlpha = veiled ? 0.25 : 1;
+      // the moon as Toronto sees it: lit on the right while waxing, on the left while waning
+      const mx = W * 0.78, my = H * 0.2, r = 30, age = sky.shown ? sky.shown.moon : 0.5;
+      const k = Math.cos(2 * Math.PI * age);  // 1 at new moon, -1 at full
+      ctx.save();
+      ctx.translate(mx, my);
+      if (age > 0.5) ctx.scale(-1, 1);
+      ctx.globalAlpha = veiled ? 0.08 : 0.12;  // the dark part, faintly
       ctx.fillStyle = "#f6edd0";
-      ctx.beginPath(); ctx.arc(W * 0.78, H * 0.2, 30, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = mix(SKIES.night[0], GREY.night, grey);
-      ctx.beginPath(); ctx.arc(W * 0.78 + 13, H * 0.2 - 8, 27, 0, Math.PI * 2); ctx.fill();
-      ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = veiled ? 0.25 : 1;
+      ctx.beginPath();
+      ctx.arc(0, 0, r, -Math.PI / 2, Math.PI / 2);  // the lit half's rim, top to bottom on the right
+      // back up along the terminator: right of centre for a crescent, left of it past the half moon
+      if (k > 0) ctx.ellipse(0, 0, r * k, r, 0, Math.PI / 2, -Math.PI / 2, true);
+      else ctx.ellipse(0, 0, -r * k, r, 0, Math.PI / 2, Math.PI * 1.5, false);
+      ctx.fill();
+      ctx.restore();
     } else {
       const pos = { dawn: [0.18, 0.62], day: [0.74, 0.2], dusk: [0.84, 0.6] }[phase];
       const sx = W * pos[0], sy = H * pos[1];

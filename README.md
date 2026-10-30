@@ -22,7 +22,7 @@ Covers and page counts come from the same book records. Each cover is downloaded
 
 ## The window
 
-The skyline follows Toronto's time of day (night, dawn, day, dusk; sunrise and sunset worked out in the browser) and, on the website, the current weather from Environment and Climate Change Canada's GeoMet API (station on-143): clear, cloudy, rain, snow or fog. The visitor's browser asks for the weather every 15 minutes, which is a request to a third party; build with `--no-weather` to switch that off. During the day the lamp is off.
+The skyline follows Toronto's time of day (night, dawn, day, dusk; sunrise and sunset worked out in the browser) and, on the website, the current weather from Environment and Climate Change Canada's GeoMet API (station on-143): clear, cloudy, rain, snow or fog. The visitor's browser asks for the weather every 15 minutes, which is a request to a third party; build with `--no-weather` to switch that off. During the day the lamp is off. At night the moon shows its real phase (lunar month from a known new moon), also for previewed dates; its position is fixed.
 
 Preview any look by adding it to the address: `#night`, `#dawn-fog`, `#day-rain`, `#dusk-snow`, `#day-cloudy`, `#night-clear` …
 
