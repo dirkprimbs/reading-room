@@ -1,0 +1,90 @@
+<!-- Test only: added with build.py --preview-controls. Drives the #phase-weather-date previews.
+     Hidden on every load; type "brain" or tap the model brain three times to show or hide it. -->
+<style>
+.pv { position: fixed; left: 12px; bottom: 12px; z-index: 20; display: grid; gap: 6px; padding: 10px 12px 12px;
+  background: rgba(20, 14, 10, .92); color: var(--ink); border: 1px solid #6b4c2f; border-radius: 6px;
+  font: 14px/1.2 var(--font-body); box-shadow: 0 8px 20px rgba(0,0,0,.5); }
+.pv b { font-family: var(--font-hand); font-size: 20px; color: var(--lamp); }
+.pv label { display: grid; grid-template-columns: 62px 1fr; align-items: center; gap: 8px; }
+.pv select { font: inherit; padding: 3px 6px; background: #f3ead8; color: #2a1d12; border: 0; border-radius: 3px; }
+.pv[hidden] { display: none; }
+.pv button { font: inherit; padding: 4px 8px; background: var(--lamp); color: #2a1d12; border: 0; border-radius: 3px; cursor: pointer; }
+.pv-buttons { display: flex; gap: 6px; }
+.pv select:focus-visible { outline: 2px solid var(--lamp); outline-offset: 1px; }
+</style>
+<form class="pv" id="pv" aria-label="Preview decorations (test only)" hidden>
+  <b>Preview (test)</b>
+  <label for="pv-date">Date
+    <select id="pv-date">
+      <option value="">Today</option>
+      <option value="jan20">Jan 20 · Winter</option>
+      <option value="feb10">Feb 10 · Black History Month</option>
+      <option value="feb17">Feb 17 · Lunar New Year</option>
+      <option value="mar15">Mar 15 · Maple syrup</option>
+      <option value="apr3">Apr 3 · Easter</option>
+      <option value="may15">May 15 · Tulips</option>
+      <option value="jun15">Jun 15 · Pride Month</option>
+      <option value="jul1">Jul 1 · Canada Day</option>
+      <option value="aug15">Aug 15 · Summer</option>
+      <option value="sep28">Sep 28 · Every Child Matters</option>
+      <option value="oct10">Oct 10 · Thanksgiving</option>
+      <option value="oct20">Oct 20 · Halloween season</option>
+      <option value="oct30">Oct 30 · Halloween</option>
+      <option value="nov5">Nov 5 · Remembrance Day</option>
+      <option value="nov20">Nov 20 · Tea lights</option>
+      <option value="dec2">Dec 2 · Advent, first candle</option>
+      <option value="dec12">Dec 12 · Christmas</option>
+      <option value="dec22">Dec 22 · Christmas, four candles</option>
+    </select>
+  </label>
+  <label for="pv-phase">Time
+    <select id="pv-phase">
+      <option value="">Now</option><option>night</option><option>dawn</option><option>day</option><option>dusk</option>
+    </select>
+  </label>
+  <label for="pv-wx">Weather
+    <select id="pv-wx">
+      <option value="">Now</option><option>clear</option><option>cloudy</option><option>rain</option><option>snow</option><option>fog</option>
+    </select>
+  </label>
+  <div class="pv-buttons"><button type="button" id="pv-visit">Send a visitor</button><button type="button" id="pv-now">Back to now</button></div>
+</form>
+<script>
+(function () {
+  const pv = document.getElementById("pv");
+  const [date, phase, wx] = ["pv-date", "pv-phase", "pv-wx"].map(id => document.getElementById(id));
+  pv.addEventListener("submit", e => e.preventDefault());
+  document.getElementById("pv-visit").addEventListener("click", () => window.sendVisitor && window.sendVisitor());
+  document.getElementById("pv-now").addEventListener("click", () => {
+    date.value = phase.value = wx.value = "";
+    history.replaceState(null, "", location.pathname + location.search);
+    applyLook();
+  });
+
+  // secret switch: type "brain", or tap the model brain three times. Not remembered: a reload starts hidden.
+  function show(on) { pv.hidden = !on; }
+  let typed = "";
+  document.addEventListener("keydown", e => {
+    if (e.target.closest && e.target.closest("input, select, textarea")) return;
+    typed = (typed + e.key.toLowerCase()).slice(-5);
+    if (typed === "brain") { show(pv.hidden); typed = ""; }
+  });
+  const brain = document.getElementById("brain-model");
+  if (brain) {
+    brain.style.pointerEvents = "auto";
+    let taps = [];
+    brain.addEventListener("click", () => {
+      const now = Date.now();
+      taps = taps.filter(x => now - x < 900).concat(now);
+      if (taps.length >= 3) { show(pv.hidden); taps = []; }
+    });
+  }
+  pv.addEventListener("change", () => {
+    // weather needs a time of day in the address; use the current one when Time is "Now"
+    const ph = phase.value || (wx.value ? (sky.shown && sky.shown.phase) || "day" : "");
+    const parts = [ph && wx.value ? ph + "-" + wx.value : ph, date.value].filter(Boolean);
+    location.hash = parts.length ? parts.join("-") : "";
+    if (!parts.length) applyLook();
+  });
+})();
+</script>
