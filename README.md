@@ -34,7 +34,7 @@ Decorations follow the date in Toronto: in the window all year, and around the r
 
 The bookcase is laid out in the page, not by fixed positions: one decoration per shelf (plant, photo, bookend at the end of its row's books) and Norbert at the start of the bottom shelf, recalculated when the books or the window width change. The cat wakes up now and then; at dusk she watches the street from the windowsill, and from December to February she sleeps under a blanket. Birds (cardinals in winter, chickadees, blue jays, robins from spring to fall), squirrels in autumn (usually black ones, as in Toronto), monarchs and bees (May to September, by day), a moth (summer nights) or a raccoon peeking over the ledge (nights from March to November) visit the window; none in rain or fog. Now and then a red streetcar goes by.
 
-At the end of the Canadiana shelf stand a clock that keeps Toronto time and a jar of paper slips for this year's reading goal, one slip per book in the colours of this year's books. A tea mug steams while the lamp is on.
+On top of the bookcase stand a clock that keeps Toronto time, a wooden toy train (a locomotive, a carriage and a wagon of logs; click it and it chugs) and a jar of paper slips for this year's reading goal, one slip per book in the colours of this year's books. A tea mug steams while the lamp is on.
 
 A book finished in the last seven days lies open over the armrest of the chair ("just finished!") before it goes onto its shelf. Add `?finished` to the address to see the latest one there anyway.
 

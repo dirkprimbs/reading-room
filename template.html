@@ -125,11 +125,11 @@ body {
 .case-deco, .floor-deco { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
 .d-case-floor-l { left: 36px; bottom: -16px; }
 .d-case-floor-r { right: 30px; bottom: -16px; }
-.d-case-top { left: 0; right: 0; top: 28px; }
+.d-case-top { left: 0; right: 0; top: 124px; }
 .d-case-top svg { width: 100%; height: auto; }
-.d-case-corner { right: 16px; top: 52px; }
+.d-case-corner { right: 16px; top: 148px; }
 .d-case-wall { right: 30px; top: -70px; }
-.d-case-hang { left: -8px; top: 40px; }
+.d-case-hang { left: -8px; top: 136px; }
 .d-case-banner { left: 50%; top: -176px; transform: translateX(-50%); }
 .d-floor { left: 0; right: 0; top: 4px; height: 60px; }
 .bookcase-top { display: flex; align-items: flex-end; justify-content: space-between; width: 100%; padding: 0 22px; }
@@ -492,13 +492,23 @@ body {
 .door:hover .door-panel, .door:focus-visible .door-panel { transform: scaleX(.6); }
 .door.opening .door-panel { transform: scaleX(.12); transition-duration: .7s; }
 .door:focus-visible svg { outline: 2px solid var(--lamp); outline-offset: 3px; }
-/* ---------- on the Canadiana shelf: a mantel clock with Toronto time and the reading-goal jar ---------- */
+/* ---------- on top of the bookcase: a mantel clock with Toronto time, the wooden toy train and the reading-goal jar ---------- */
 .clock { width: 58px; height: 74px; outline: none; filter: drop-shadow(2px 4px 4px rgba(0,0,0,.45)); }
 .clock svg { display: block; overflow: visible; }
 .clock:focus-visible { box-shadow: 0 0 0 2px var(--lamp); border-radius: 4px; }
 .pendulum { transform-box: view-box; transform-origin: 29px 54px; animation: pendulum 2s ease-in-out infinite alternate; }
 @keyframes pendulum { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
-.shelves .shelf-extra { margin-left: auto; gap: 10px; padding-right: 4px; }
+.case-top-row { display: flex; align-items: flex-end; justify-content: space-between; width: min(600px, calc(100vw - 40px)); height: 96px; margin-bottom: -6px; padding: 0 34px; }
+.train { outline: none; border-radius: 4px; }
+.train svg { display: block; overflow: visible; }
+.train:focus-visible { box-shadow: 0 0 0 2px var(--lamp); }
+.train .puff { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.chug { animation: chug 1.8s ease-in-out; }
+.chug .puff { animation: puff 1.4s ease-out; }
+.chug .puff:nth-of-type(2) { animation-delay: .35s; }
+.chug .puff:nth-of-type(3) { animation-delay: .7s; }
+@keyframes chug { 30% { translate: -16px 0; } 45% { translate: -16px 0; } 100% { translate: 0 0; } }
+@keyframes puff { 0% { opacity: .8; transform: translate(0, 0) scale(.5); } 100% { opacity: 0; transform: translate(10px, -26px) scale(1.6); } }
 .jar { width: 64px; height: 90px; outline: none; border-radius: 4px; }
 .jar svg { display: block; overflow: visible; }
 .jar:focus-visible { box-shadow: 0 0 0 2px var(--lamp); }
@@ -682,6 +692,7 @@ body {
         <div class="hand" id="read-label"><a class="shelf-link" href="https://bookwyrm.social/user/drkprmbs/books/read" title="The Read shelf on BookWyrm">Read <small id="read-count"></small></a></div>
         <button class="hand sort-switch" id="sort" type="button" title="Sort the bookcase another way"><small>by author, A to Z</small></button>
       </div>
+      <div class="case-top-row" id="case-top-row"></div>
       <div class="bookcase grounded"><div class="shelves" id="shelves"></div></div>
     </section>
 
@@ -1006,11 +1017,8 @@ layoutBookcase();
 const cn = document.getElementById("cn-shelf");
 readCanada.forEach(b => addSpine(cn, b, "Read", 66, 30, 0.8));
 const cnSlots = [...cn.children];
-// the clock and the goal jar stand together at the right end of the Canadiana shelf's last row
-const cnCorner = document.createElement("div");
-cnCorner.className = "slot deco-slot shelf-extra";
-cn.appendChild(cnCorner);
-const shelfExtra = el => cnCorner.appendChild(el);
+// on top of the bookcase: the clock, the toy train and the goal jar
+const caseTop = document.getElementById("case-top-row");
 const clockEl = document.createElement("div");
 clockEl.className = "deco clock";
 clockEl.tabIndex = 0;
@@ -1027,7 +1035,35 @@ clockEl.innerHTML = `<svg width="58" height="74" viewBox="0 0 58 74" aria-hidden
   <line id="clock-s" x1="29" y1="36" x2="29" y2="16" stroke="#b3262c" stroke-width=".8"/>
   <circle cx="29" cy="32" r="1.6" fill="#2a1d12"/>
   <rect x="1" y="69" width="56" height="5" rx="1.5" fill="#4a2d18"/></svg>`;
-shelfExtra(clockEl);
+caseTop.appendChild(clockEl);
+// the wooden toy train: a locomotive, a carriage and a wagon of logs; click it and it chugs
+const wheel = (cx, cy, r, rim) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${rim}"/><circle cx="${cx}" cy="${cy}" r="${r * 0.68}" fill="#e6c98a"/><circle cx="${cx}" cy="${cy}" r="1.6" fill="#1a1a1a"/>`;
+const train = document.createElement("div");
+train.className = "deco train";
+train.tabIndex = 0;
+train.setAttribute("role", "img");
+train.setAttribute("aria-label", "A wooden toy train");
+train.innerHTML = `<svg data-click="train" width="270" height="83" viewBox="0 0 300 92" aria-hidden="true">
+  <circle class="puff" cx="23" cy="0" r="5" fill="#e8e4dc"/><circle class="puff" cx="23" cy="0" r="6" fill="#e8e4dc"/><circle class="puff" cx="23" cy="0" r="4.5" fill="#e8e4dc"/>
+  <rect x="4" y="62" width="120" height="8" fill="#1f3326"/>
+  <rect x="8" y="38" width="82" height="25" rx="5" fill="#2a2220"/><rect x="8" y="51" width="82" height="3.5" fill="#b3262c"/><rect x="8" y="54.5" width="82" height="8.5" fill="#3a2e28"/>
+  <path d="M48 41 V60 M53 41 V60 M48 45 H53 M48 50 H53 M48 56 H53" stroke="#5a4a40" stroke-width=".9"/>
+  <path d="M18 38 L16 9 H30 L28 38 Z" fill="#e2b84a"/><rect x="14.5" y="1" width="17" height="10" rx="3" fill="#1a1a1a"/>
+  <rect x="56" y="29" width="7" height="10" rx="1.5" fill="#e2b84a"/>
+  <rect x="88" y="16" width="29" height="47" fill="#2f5a3a"/><rect x="92" y="21" width="21" height="6" fill="#a9cbe0" stroke="#e8e4dc" stroke-width="1"/>
+  <path d="M84 18 L122 9 L123 12 L85 21 Z" fill="#d8bb86"/>
+  <rect x="117" y="52" width="10" height="11" fill="#3a2e28"/><rect x="117" y="54" width="10" height="3" fill="#b3262c"/><rect x="117" y="57" width="10" height="2" fill="#e8e4dc"/>
+  ${wheel(22, 74, 11, "#9a3a2c")}${wheel(106, 74, 11, "#9a3a2c")}
+  <rect x="133" y="61" width="80" height="6" fill="#2a2622"/><path d="M128 64 H133 M213 64 H218" stroke="#5a5a5a" stroke-width="1.5"/>
+  <rect x="137" y="45" width="72" height="16" fill="#b3262c"/><rect x="137" y="29" width="72" height="16" fill="#e2c27a"/>
+  <rect x="150" y="31" width="13" height="14" fill="#2a2622"/><rect x="181" y="31" width="13" height="14" fill="#2a2622"/><path d="M137 45 H209" stroke="#2a2622" stroke-width="1.5"/>
+  <rect x="133" y="25" width="80" height="4.5" fill="#e8e4dc"/><ellipse cx="155" cy="24" rx="6" ry="2.4" fill="#1a1a1a"/><ellipse cx="190" cy="24" rx="6" ry="2.4" fill="#1a1a1a"/>
+  ${wheel(150, 73, 8.5, "#b0603a")}${wheel(196, 73, 8.5, "#b0603a")}
+  <rect x="223" y="56" width="76" height="7" fill="#3f6a40"/><rect x="229" y="40" width="5" height="16" fill="#3f6a40"/><rect x="288" y="40" width="5" height="16" fill="#3f6a40"/>
+  ${[[51, 0], [46, 2], [41, 0], [36, 4]].map(([y, dx], i) => `<rect x="${235 + dx}" y="${y}" width="${52 - dx}" height="5" rx="2.5" fill="${i % 2 ? "#8a7e66" : "#7a6e58"}"/><circle cx="${237.5 + dx}" cy="${y + 2.5}" r="2.5" fill="#5e5444"/>`).join("")}
+  ${wheel(238, 71, 8.5, "#9a3a2c")}${wheel(284, 71, 8.5, "#9a3a2c")}
+</svg>`;
+caseTop.appendChild(train);
 
 // the sort switch: by author, A to Z (the build's order), or by the colour of the spines
 function colourKey(el) {
@@ -1047,7 +1083,6 @@ sortButton.addEventListener("click", () => {
     list.sort((a, b) => byColour ? colourKey(a.firstElementChild) - colourKey(b.firstElementChild) : a.firstElementChild._i - b.firstElementChild._i);
   });
   cnSlots.forEach(slot => cn.appendChild(slot));
-  cn.appendChild(cnCorner);  // the clock and the jar stay at the end
   layoutBookcase();
 });
 
@@ -1140,7 +1175,7 @@ if (DATA.goal) {
     <g transform="rotate(8 47 36)"><path d="M39 30 H55 V44 H39 L36 37 Z" fill="#e8d6ae" stroke="#a8875a" stroke-width=".6"/>
       <text x="46.5" y="36" font-family="Caveat, cursive" font-weight="700" font-size="7" text-anchor="middle" fill="#3a2a17">${y}</text>
       <text x="46.5" y="42.5" font-family="Caveat, cursive" font-weight="700" font-size="6.5" text-anchor="middle" fill="#8a3b2b">${n}/${of}</text></g></svg>`;
-  shelfExtra(jar);
+  caseTop.appendChild(jar);
   const note = `${y} reading goal: ${n} of ${of} books` + (n >= of ? ", done!" : "");
   ["mouseenter", "focus"].forEach(ev => jar.addEventListener(ev, () => showNote(jar, note)));
   ["mouseleave", "blur"].forEach(ev => jar.addEventListener(ev, () => hideTip()));
@@ -1715,6 +1750,7 @@ room.addEventListener("click", e => {
     case "snowglobe": replay(art, "shaken", 3600); return replay(item, "wiggle", 800);
     case "tree": return replay(art, "sparkle", 3000);
     case "bats": return replay(art, "flutter", 2000);
+    case "train": return replay(art, "chug", 1900);
     case "spider":  // drop down the thread right now
       return document.getAnimations().forEach(a => {
         if (/^spider-(drop|thread|sway)$/.test(a.animationName) && art.contains(a.effect.target)) a.currentTime = 9600;
