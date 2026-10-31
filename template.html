@@ -560,7 +560,7 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 .room.hubert .chair .cat:not(.hop), .room.hubert .sill-cat { display: none; }
 .room.hubert .watch-cat { display: block; }
 .hubert-canvas { position: absolute; left: 0; top: -30px; width: 100%; height: 100px; z-index: 2; pointer-events: none; }
-.hubert-hit { position: absolute; z-index: 3; width: 70px; height: 44px; margin: -30px 0 0 -35px; display: none; }
+.hubert-hit { position: absolute; z-index: 3; width: 70px; height: 44px; margin: -30px 0 0 -35px; display: none; pointer-events: auto; cursor: pointer; }
 /* the sort switch, written next to the bookcase */
 .sort-switch { padding: 0; background: none; border: 0; cursor: pointer; text-decoration: underline dotted rgba(187, 166, 139, .6); text-underline-offset: 5px; }
 .sort-switch:hover small, .sort-switch:focus-visible small { color: var(--lamp); }
@@ -1433,7 +1433,10 @@ function fit() {
   room.classList.toggle("phone", phone);
   document.documentElement.classList.toggle("phone", phone);
   room.style.height = phone ? window.innerHeight + "px" : "";
-  stage.style.zoom = floorEl.style.zoom = phone ? scroller.clientHeight / height : widthZoom;
+  // on a big screen the room grows with the window's width until it is as tall as the window
+  const credits = document.querySelector(".credits");
+  const grow = Math.max(1, Math.min(vw / 1673, (window.innerHeight - (credits ? credits.offsetHeight : 0)) / height));
+  stage.style.zoom = floorEl.style.zoom = phone ? scroller.clientHeight / height : widthZoom < 1 ? widthZoom : grow;
   if (phone) {
     if (centre !== null) scroller.scrollLeft = centre * scroller.scrollWidth - scroller.clientWidth / 2;
     else {  // start at the window
@@ -2497,9 +2500,13 @@ setInterval(loadWeather, 15 * 60e3);
   window.sendHubert = () => { if (!bot) start(performance.now()); };
   ["mouseenter", "focus"].forEach(ev => hit.addEventListener(ev, () => showNote(hit, "Hubert, the vacuum robot")));
   hit.addEventListener("mouseleave", hideTip);
+  hit.addEventListener("click", () => {  // as if he bumped into something: stop, turn once all the way round, carry on
+    if (!bot || bot.spin || bot.state !== "drive") return;
+    Object.assign(bot, { state: "bump", t: bot.last, wait: 500, spin: true, turn: (Math.random() < 0.5 ? -1 : 1) * Math.PI * 2 });
+  });
 
   function start(now) {
-    W = floor.clientWidth; dpr = window.devicePixelRatio || 1;
+    W = floor.clientWidth; dpr = (window.devicePixelRatio || 1) * Math.max(1, parseFloat(floor.style.zoom) || 1);
     cv.width = W * dpr; cv.height = 100 * dpr;
     bot = { x: W + R + 10, y: 34 + Math.random() * 12, a: Math.PI + (Math.random() - 0.5) * 0.4, state: "drive", t: now, last: now,
       start: now, stay: 55e3 + Math.random() * 30e3, turn: 0, eye: [{ x: 0, y: 0, vx: 0, vy: 0 }, { x: 0, y: 0, vx: 0, vy: 0 }], gone: false };
@@ -2589,13 +2596,16 @@ setInterval(loadWeather, 15 * 60e3);
         b.x = nx; b.y = Math.min(ny, 66 - R * K);
       }
     } else if (b.state === "bump") {  // a moment's thought
-      if (now - b.t > b.wait) { b.state = "reverse"; b.t = now; }
+      if (now - b.t > b.wait) {
+        if (b.spin) { b.state = "turn"; b.t = now; b.from = b.a; b.turnT = 1800; b.spin = false; }  // clicked: a full turn, no backing up
+        else { b.state = "reverse"; b.t = now; }
+      }
     } else if (b.state === "reverse") {
       v = -SPEED * 0.6;
       b.x += Math.cos(b.a) * v * dt; b.y = Math.max(R * K + 2, Math.min(66 - R * K, b.y + Math.sin(b.a) * v * dt * K));
-      if (now - b.t > 420) { b.state = "turn"; b.t = now; b.from = b.a; }
+      if (now - b.t > 420) { b.state = "turn"; b.t = now; b.from = b.a; b.turnT = 600; }
     } else if (b.state === "turn") {
-      const q = Math.min(1, (now - b.t) / 600);
+      const q = Math.min(1, (now - b.t) / b.turnT);
       b.a = b.from + b.turn * q * q * (3 - 2 * q);
       if (q >= 1) b.state = "drive";
     }

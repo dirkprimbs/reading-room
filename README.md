@@ -40,7 +40,7 @@ A book finished in the last seven days lies open over the armrest of the chair (
 
 The note by the bookcase switches the order: by date finished (newest first, the default; undated books at the end), by author (A to Z) or by colour, a rainbow. The Canadiana shelf follows along, and the browser remembers the choice for the next visit. Every book has its own address: opening a card changes the address to `#book-<id>`, a link with it opens that card, and the card can copy the link.
 
-Things react to clicks: the cat startles, the photo sends up a heart (three quick clicks: a burst of hearts), visitors fly off, decorations wobble or swing, floor leaves blow elsewhere, carved pumpkins turn scary for a second, the lamp switches on and off (until the next reload), the cat on the sill looks round, the streetcar rings, candles blow out and relight, string lights switch, the snow globe snows, the tree sparkles, bats flutter, the spider drops, and clicking the CN Tower sends a UFO to beam up a raccoon. Rows with room to spare let their last book lean against its neighbour.
+Things react to clicks: the cat startles, the photo sends up a heart (three quick clicks: a burst of hearts), visitors fly off, decorations wobble or swing, floor leaves blow elsewhere, carved pumpkins turn scary for a second, the lamp switches on and off (until the next reload), the cat on the sill looks round, the streetcar rings, Hubert stops and turns once all the way round, candles blow out and relight, string lights switch, the snow globe snows, the tree sparkles, bats flutter, the spider drops, and clicking the CN Tower sends a UFO to beam up a raccoon. Rows with room to spare let their last book lean against its neighbour.
 
 Two ways out of the room: the half-open door (primbs.ca, "the rest of the house") swings open, and the typewriter on the side table (Unprompted, the blog) types and dings, before the link opens in the same tab.
 
@@ -48,7 +48,7 @@ The page includes a hidden preview panel (`--preview-controls`). Type `brain` on
 
 ## On phones
 
-The room keeps its layout everywhere and is scaled like a picture. On a phone (or a touch screen where the room fitted to the width would be taller than the screen) it fills the screen's height instead and scrolls sideways, starting at the window; any swipe, up and down too, moves through the room, and taps still open books and work the room.
+The room keeps its layout everywhere and is scaled like a picture: it fills the width of the window, and on a big screen it grows with the width until it is as tall as the window. On a phone (or a touch screen where the room fitted to the width would be taller than the screen) it fills the screen's height instead and scrolls sideways, starting at the window; any swipe, up and down too, moves through the room, and taps still open books and work the room.
 
 ## License
 
