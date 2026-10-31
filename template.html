@@ -692,7 +692,7 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
       <div class="case-deco" id="case-deco" aria-hidden="true"></div>
       <div class="bookcase-top">
         <div class="hand" id="read-label"><a class="shelf-link" href="https://bookwyrm.social/user/drkprmbs/books/read" title="The Read shelf on BookWyrm">Read <small id="read-count"></small></a></div>
-        <button class="hand sort-switch" id="sort" type="button" title="Sort the bookcase another way"><small>by author, A to Z</small></button>
+        <button class="hand sort-switch" id="sort" type="button" title="Sort the bookcase another way"><small>by date finished, newest first</small></button>
       </div>
       <div class="case-top-row" id="case-top-row"></div>
       <div class="bookcase grounded"><div class="shelves" id="shelves"></div></div>
@@ -1066,7 +1066,7 @@ train.innerHTML = `<svg data-click="train" width="270" height="77" viewBox="0 0 
 </svg>`;
 caseTop.appendChild(train);
 
-// the sort switch: by author, A to Z (the build's order), or by the colour of the spines
+// the sort switch: by date finished (the default), by author, A to Z (the build's order), or by the colour of the spines
 function colourKey(el) {
   const n = parseInt(el.style.getPropertyValue("--c").slice(1), 16);
   const [r, g, b] = [n >> 16, (n >> 8) & 255, n & 255].map(v => v / 255);
@@ -1076,16 +1076,29 @@ function colourKey(el) {
   return (h * 60 + 20) % 360;  // start with the reds just below 360 degrees
 }
 const sortButton = document.getElementById("sort");
-let byColour = false;
-sortButton.addEventListener("click", () => {
-  byColour = !byColour;
-  sortButton.firstElementChild.textContent = byColour ? "by colour" : "by author, A to Z";
+const SORTS = {
+  date: { label: "by date finished, newest first", key: el => -Date.parse(el._book.f || "1900-01-01") },  // undated at the end
+  author: { label: "by author, A to Z", key: el => el._i },
+  colour: { label: "by colour", key: colourKey }
+};
+let sortBy = "date";
+try { if (SORTS[localStorage.getItem("reading-room-sort")]) sortBy = localStorage.getItem("reading-room-sort"); } catch (e) {}
+function applySort() {
+  const s = SORTS[sortBy];
+  sortButton.firstElementChild.textContent = s.label;
   [bookSlots, cnSlots].forEach(list => {
-    list.sort((a, b) => byColour ? colourKey(a.firstElementChild) - colourKey(b.firstElementChild) : a.firstElementChild._i - b.firstElementChild._i);
+    list.sort((a, b) => s.key(a.firstElementChild) - s.key(b.firstElementChild) || a.firstElementChild._i - b.firstElementChild._i);
   });
   cnSlots.forEach(slot => cn.appendChild(slot));
   layoutBookcase();
+}
+sortButton.addEventListener("click", () => {
+  const names = Object.keys(SORTS);
+  sortBy = names[(names.indexOf(sortBy) + 1) % names.length];
+  try { localStorage.setItem("reading-room-sort", sortBy); } catch (e) {}  // remembered for the next visit
+  applySort();
 });
+if (sortBy !== "author") applySort();
 
 // cardboard box: stopped reading
 const stopped = document.getElementById("stopped");

@@ -4,7 +4,7 @@
 
 Live at https://primbs.ca/reading-room/
 
-A cozy-living-room page of Dirk's BookWyrm shelves (bookwyrm.social/user/drkprmbs): a bookcase of read books grouped by author (A to Z), read Canadian books on a wall shelf, the current books on a side table, to-read piles and a box of stopped books, with star ratings, reviews and finish dates on hover.
+A cozy-living-room page of Dirk's BookWyrm shelves (bookwyrm.social/user/drkprmbs): a bookcase of read books (newest first, or by author or colour), read Canadian books on a wall shelf, the current books on a side table, to-read piles and a box of stopped books, with star ratings, reviews and finish dates on hover.
 
 ## How it's built
 
@@ -38,7 +38,7 @@ On top of the bookcase stand a clock that keeps Toronto time, a wooden toy train
 
 A book finished in the last seven days lies open over the armrest of the chair ("just finished!") before it goes onto its shelf. Add `?finished` to the address to see the latest one there anyway.
 
-The note by the bookcase switches the order between by author (A to Z) and by colour, a rainbow; the Canadiana shelf follows along. Every book has its own address: opening a card changes the address to `#book-<id>`, a link with it opens that card, and the card can copy the link.
+The note by the bookcase switches the order: by date finished (newest first, the default; undated books at the end), by author (A to Z) or by colour, a rainbow. The Canadiana shelf follows along, and the browser remembers the choice for the next visit. Every book has its own address: opening a card changes the address to `#book-<id>`, a link with it opens that card, and the card can copy the link.
 
 Things react to clicks: the cat startles, visitors fly off, decorations wobble or swing, floor leaves blow elsewhere, carved pumpkins turn scary for a second, the lamp switches on and off (until the next reload), the cat on the sill looks round, the streetcar rings, candles blow out and relight, string lights switch, the snow globe snows, the tree sparkles, bats flutter, the spider drops, and clicking the CN Tower sends a UFO to beam up a raccoon. Rows with room to spare let their last book lean against its neighbour.
 
