@@ -71,6 +71,7 @@ body {
 .stage.scene { width: 1673px; max-width: none; flex-wrap: nowrap; }
 .stage.scene .bookcase, .stage.scene .case-top-row { width: 600px; }
 .stage.scene .nook { width: 470px; }
+.stage.scene .bookcase-wrap { margin-top: 160px; }  /* room above for what hangs over the bookcase (bats, banner) when it grows taller than the window wall */
 .stage.scene .piles-wrap { width: 330px; }
 /* on a phone the room fills the screen's height and scrolls sideways; the wall scrolls along with it */
 html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavior: none; }
@@ -961,14 +962,15 @@ function layoutBookcase() {
     const sp = slot.firstElementChild;
     return parseFloat(sp.style.getPropertyValue("--w")) + 1;
   };
-  const pack = plan => {
+  const plan = ["plant", "photo", "bookend"];
+  const pack = limit => {  // fill each row up to the limit, in order
     const rows = [];
     let i = 0;
     while (i < bookSlots.length) {
       const deco = plan[rows.length];
       let used = deco ? DECO_WIDTH[deco] : 0;
       const books = [];
-      while (i < bookSlots.length && (books.length === 0 || used + width(bookSlots[i]) <= capacity)) {
+      while (i < bookSlots.length && (books.length === 0 || used + width(bookSlots[i]) <= limit)) {
         used += width(bookSlots[i]);
         books.push(bookSlots[i++]);
       }
@@ -976,14 +978,22 @@ function layoutBookcase() {
     }
     return rows;
   };
-  // Norbert needs room on the bottom shelf; where a row ends depends on the order of the books, so if he
-  // doesn't fit, try the decorations on other rows, then without the plant, before giving him a shelf of his own
-  const plans = [["plant", "photo", "bookend"], ["photo", "plant", "bookend"], ["plant", "bookend", "photo"],
-    ["bookend", "plant", "photo"], ["photo", "bookend", "plant"], ["bookend", "photo", "plant"], ["photo", "bookend"]];
   const fits = rows => rows[rows.length - 1].used + DECO_WIDTH.brain <= capacity;
-  let rows = plans.map(pack).find(fits);
-  if (rows) rows[rows.length - 1].brainFirst = true;
-  else (rows = pack(plans[0])).push({ books: [], brainFirst: true });
+  let rows = pack(capacity);
+  if (!fits(rows)) {
+    // Norbert needs another shelf: rather than leave it empty, take a few books off each full shelf and move
+    // a handful down to him (the gaps they leave let the last books lean)
+    const n = rows.length + 1;
+    let best = null;
+    for (let limit = capacity - 1; limit > 0; limit--) {
+      const r = pack(limit);
+      if (r.length > n) break;
+      if (r.length === n && fits(r)) { best = r; if (r[n - 1].books.length >= 6) break; }  // a handful is enough
+      else if (best) break;
+    }
+    if (best) rows = best; else rows.push({ books: [], used: 0 });
+  }
+  rows[rows.length - 1].brainFirst = true;
   const at = { plant: 0.72, photo: 0.18, bookend: 1 };  // where in the row each decoration stands
   shelves.innerHTML = "";
   bookSlots.forEach(slot => {
