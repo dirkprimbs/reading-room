@@ -1921,6 +1921,7 @@ async function loadWeather() {
     const { phase, cond } = sky.shown || {};
     const m = sky.month || 1;
     if (cond === "rain" || cond === "fog") return null;
+    if (room.classList.contains("cat-out")) return null;  // nobody lands with the cat on the sill
     if (phase === "night") {
       const night = [];
       if (m >= 5 && m <= 9 && cond !== "snow") night.push("moth");
@@ -2149,6 +2150,8 @@ async function loadWeather() {
   function drawVisitor(t) {
     clock = t;
     if (still) return;
+    if (visitor && !visitor.flee && visitor.x !== undefined && room.classList.contains("cat-out"))  // the cat jumps up: off they go
+      visitor.flee = { t, x: visitor.x, y: visitor.y, rise: visitor.rise };
     if (visitor && (visitor.kind === "raccoon" || visitor.kind === "squirrel")) return drawCritter(t);
     if (visitor && visitor.flee) {  // startled by a click: off and away
       const f = visitor.flee, q = Math.min(1, (t - f.t) / 1100), ex = f.x > W / 2 ? W + 60 : -60;
