@@ -380,7 +380,7 @@ body {
     repeating-linear-gradient(0deg, rgba(120,30,30,.0) 0 10px, rgba(255,240,210,.30) 10px 13px),
     #a0453a;
   transform: rotate(4deg); box-shadow: 0 6px 10px rgba(0,0,0,.35); }
-.cat { left: 56px; top: 92px; width: 100px; height: 40px; }
+.cat { left: 56px; top: 92px; width: 100px; height: 40px; z-index: 3; }  /* in front of the book on the armrest when she stands up */
 .cat .body { position: absolute; left: 0; bottom: 0; width: 82px; height: 34px; border-radius: 50% 50% 40% 40%; background: linear-gradient(180deg, #d88a45, #b96d2f); }
 .cat .head { position: absolute; right: 2px; bottom: 4px; width: 32px; height: 28px; border-radius: 50%; background: #d88a45; }
 .cat .ear { position: absolute; bottom: 24px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 11px solid #c87a3a; }
@@ -530,8 +530,6 @@ body {
 @keyframes sc-look { 30%, 60% { transform: rotate(-16deg) translateX(-2px); } }
 .room.cat-out .chair .cat { display: none; }
 .room.cat-out .sill-cat { display: block; }
-/* tea in the mug while the lamp is on */
-.room.daylight:not(.lamp-on) .steam, .room.lamp-off .steam { display: none; }
 /* the sort switch, written next to the bookcase */
 .sort-switch { padding: 0; background: none; border: 0; cursor: pointer; text-decoration: underline dotted rgba(187, 166, 139, .6); text-underline-offset: 5px; }
 .sort-switch:hover small, .sort-switch:focus-visible small { color: var(--lamp); }
@@ -1099,8 +1097,9 @@ const stack = document.getElementById("stack");
 DATA.reading.forEach((b, i) => {
   const el = makeBook(b, "Reading now", "flat");
   const r = el._rand;
-  el.style.setProperty("--t", Math.max(18, Math.min(30, Math.round(thickness(b, r) * 0.85))) + "px");
-  el.style.setProperty("--w", Math.round(150 + r() * 22) + "px");
+  // about as long as the books on the shelves are tall
+  el.style.setProperty("--t", Math.max(16, Math.min(24, Math.round(thickness(b, r) * 0.7))) + "px");
+  el.style.setProperty("--w", Math.round(112 + r() * 18) + "px");
   el.style.setProperty("--x", Math.round((r() - 0.5) * 14) + "px");
   el.style.setProperty("--r", ((r() - 0.5) * 2.4).toFixed(1) + "deg");
   stack.appendChild(el);
