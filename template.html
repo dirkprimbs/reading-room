@@ -498,7 +498,7 @@ body {
 .clock:focus-visible { box-shadow: 0 0 0 2px var(--lamp); border-radius: 4px; }
 .pendulum { transform-box: view-box; transform-origin: 29px 54px; animation: pendulum 2s ease-in-out infinite alternate; }
 @keyframes pendulum { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
-.case-top-row { display: flex; align-items: flex-end; justify-content: space-between; width: min(600px, calc(100vw - 40px)); height: 96px; margin-bottom: -6px; padding: 0 34px; }
+.case-top-row { display: flex; align-items: flex-end; justify-content: space-between; width: min(600px, calc(100vw - 40px)); height: 96px; margin-bottom: -10px; padding: 0 34px; position: relative; z-index: 1; }
 .train { outline: none; border-radius: 4px; }
 .train svg { display: block; overflow: visible; }
 .train:focus-visible { box-shadow: 0 0 0 2px var(--lamp); }
@@ -509,7 +509,7 @@ body {
 .chug .puff:nth-of-type(3) { animation-delay: .7s; }
 @keyframes chug { 30% { translate: -16px 0; } 45% { translate: -16px 0; } 100% { translate: 0 0; } }
 @keyframes puff { 0% { opacity: .8; transform: translate(0, 0) scale(.5); } 100% { opacity: 0; transform: translate(10px, -26px) scale(1.6); } }
-.jar { width: 64px; height: 90px; outline: none; border-radius: 4px; }
+.jar { width: 64px; height: 87px; outline: none; border-radius: 4px; }
 .jar svg { display: block; overflow: visible; }
 .jar:focus-visible { box-shadow: 0 0 0 2px var(--lamp); }
 /* a book finished in the last week, lying open on the armrest */
@@ -1043,7 +1043,7 @@ train.className = "deco train";
 train.tabIndex = 0;
 train.setAttribute("role", "img");
 train.setAttribute("aria-label", "A wooden toy train");
-train.innerHTML = `<svg data-click="train" width="270" height="83" viewBox="0 0 300 92" aria-hidden="true">
+train.innerHTML = `<svg data-click="train" width="270" height="77" viewBox="0 0 300 85" aria-hidden="true">
   <circle class="puff" cx="23" cy="0" r="5" fill="#e8e4dc"/><circle class="puff" cx="23" cy="0" r="6" fill="#e8e4dc"/><circle class="puff" cx="23" cy="0" r="4.5" fill="#e8e4dc"/>
   <rect x="4" y="62" width="120" height="8" fill="#1f3326"/>
   <rect x="8" y="38" width="82" height="25" rx="5" fill="#2a2220"/><rect x="8" y="51" width="82" height="3.5" fill="#b3262c"/><rect x="8" y="54.5" width="82" height="8.5" fill="#3a2e28"/>
@@ -1054,14 +1054,14 @@ train.innerHTML = `<svg data-click="train" width="270" height="83" viewBox="0 0 
   <path d="M84 18 L122 9 L123 12 L85 21 Z" fill="#d8bb86"/>
   <rect x="117" y="52" width="10" height="11" fill="#3a2e28"/><rect x="117" y="54" width="10" height="3" fill="#b3262c"/><rect x="117" y="57" width="10" height="2" fill="#e8e4dc"/>
   ${wheel(22, 74, 11, "#9a3a2c")}${wheel(106, 74, 11, "#9a3a2c")}
-  <rect x="133" y="61" width="80" height="6" fill="#2a2622"/><path d="M128 64 H133 M213 64 H218" stroke="#5a5a5a" stroke-width="1.5"/>
+  <g transform="translate(0 3.5)"><rect x="133" y="61" width="80" height="6" fill="#2a2622"/><path d="M128 64 H133 M213 64 H218" stroke="#5a5a5a" stroke-width="1.5"/>
   <rect x="137" y="45" width="72" height="16" fill="#b3262c"/><rect x="137" y="29" width="72" height="16" fill="#e2c27a"/>
   <rect x="150" y="31" width="13" height="14" fill="#2a2622"/><rect x="181" y="31" width="13" height="14" fill="#2a2622"/><path d="M137 45 H209" stroke="#2a2622" stroke-width="1.5"/>
   <rect x="133" y="25" width="80" height="4.5" fill="#e8e4dc"/><ellipse cx="155" cy="24" rx="6" ry="2.4" fill="#1a1a1a"/><ellipse cx="190" cy="24" rx="6" ry="2.4" fill="#1a1a1a"/>
-  ${wheel(150, 73, 8.5, "#b0603a")}${wheel(196, 73, 8.5, "#b0603a")}
-  <rect x="223" y="56" width="76" height="7" fill="#3f6a40"/><rect x="229" y="40" width="5" height="16" fill="#3f6a40"/><rect x="288" y="40" width="5" height="16" fill="#3f6a40"/>
+  ${wheel(150, 73, 8.5, "#b0603a")}${wheel(196, 73, 8.5, "#b0603a")}</g>
+  <g transform="translate(0 5.5)"><rect x="223" y="56" width="76" height="7" fill="#3f6a40"/><rect x="229" y="40" width="5" height="16" fill="#3f6a40"/><rect x="288" y="40" width="5" height="16" fill="#3f6a40"/>
   ${[[51, 0], [46, 2], [41, 0], [36, 4]].map(([y, dx], i) => `<rect x="${235 + dx}" y="${y}" width="${52 - dx}" height="5" rx="2.5" fill="${i % 2 ? "#8a7e66" : "#7a6e58"}"/><circle cx="${237.5 + dx}" cy="${y + 2.5}" r="2.5" fill="#5e5444"/>`).join("")}
-  ${wheel(238, 71, 8.5, "#9a3a2c")}${wheel(284, 71, 8.5, "#9a3a2c")}
+  ${wheel(238, 71, 8.5, "#9a3a2c")}${wheel(284, 71, 8.5, "#9a3a2c")}</g>
 </svg>`;
 caseTop.appendChild(train);
 
@@ -1164,7 +1164,7 @@ if (DATA.goal) {
   jar.tabIndex = 0;
   jar.setAttribute("role", "img");
   jar.setAttribute("aria-label", `Reading goal ${y}: ${n} of ${of} books`);
-  jar.innerHTML = `<svg width="64" height="90" viewBox="0 0 50 70" aria-hidden="true">
+  jar.innerHTML = `<svg width="64" height="87" viewBox="0 0 50 68" aria-hidden="true">
     <path d="M7 16 Q5 16 5 20 V62 Q5 68 11 68 H39 Q45 68 45 62 V20 Q45 16 43 16 Z" fill="rgba(200,225,235,.14)"/>
     ${slips}
     <path d="M7 16 Q5 16 5 20 V62 Q5 68 11 68 H39 Q45 68 45 62 V20 Q45 16 43 16 Z" fill="none" stroke="rgba(235,248,255,.65)" stroke-width="1.4"/>
