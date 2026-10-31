@@ -961,22 +961,29 @@ function layoutBookcase() {
     const sp = slot.firstElementChild;
     return parseFloat(sp.style.getPropertyValue("--w")) + 1;
   };
-  const plan = ["plant", "photo", "bookend"];
-  const rows = [];
-  let i = 0;
-  while (i < bookSlots.length) {
-    const deco = plan[rows.length];
-    let used = deco ? DECO_WIDTH[deco] : 0;
-    const books = [];
-    while (i < bookSlots.length && (books.length === 0 || used + width(bookSlots[i]) <= capacity)) {
-      used += width(bookSlots[i]);
-      books.push(bookSlots[i++]);
+  const pack = plan => {
+    const rows = [];
+    let i = 0;
+    while (i < bookSlots.length) {
+      const deco = plan[rows.length];
+      let used = deco ? DECO_WIDTH[deco] : 0;
+      const books = [];
+      while (i < bookSlots.length && (books.length === 0 || used + width(bookSlots[i]) <= capacity)) {
+        used += width(bookSlots[i]);
+        books.push(bookSlots[i++]);
+      }
+      rows.push({ books, deco, used });
     }
-    rows.push({ books, deco, used });
-  }
-  const last = rows[rows.length - 1];
-  if (last.used + DECO_WIDTH.brain <= capacity) last.brainFirst = true;
-  else rows.push({ books: [], brainFirst: true });
+    return rows;
+  };
+  // Norbert needs room on the bottom shelf; where a row ends depends on the order of the books, so if he
+  // doesn't fit, try the decorations on other rows, then without the plant, before giving him a shelf of his own
+  const plans = [["plant", "photo", "bookend"], ["photo", "plant", "bookend"], ["plant", "bookend", "photo"],
+    ["bookend", "plant", "photo"], ["photo", "bookend", "plant"], ["bookend", "photo", "plant"], ["photo", "bookend"]];
+  const fits = rows => rows[rows.length - 1].used + DECO_WIDTH.brain <= capacity;
+  let rows = plans.map(pack).find(fits);
+  if (rows) rows[rows.length - 1].brainFirst = true;
+  else (rows = pack(plans[0])).push({ books: [], brainFirst: true });
   const at = { plant: 0.72, photo: 0.18, bookend: 1 };  // where in the row each decoration stands
   shelves.innerHTML = "";
   bookSlots.forEach(slot => {
