@@ -41,7 +41,7 @@ body {
     repeating-linear-gradient(90deg, var(--wall) 0 46px, var(--wall-stripe) 46px 50px);
 }
 /* warm light from the lamp over the whole room */
-.room::before {
+.room::before, .room.phone .scene-box::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -51,7 +51,7 @@ body {
   mix-blend-mode: screen;
 }
 .room.daylight { --wall: #382c26; --wall-stripe: #3d3029; }
-.room.daylight::before { background: radial-gradient(ellipse 30% 45% at 55% 32%, rgba(200, 225, 255, .14), rgba(200, 225, 255, .04) 50%, transparent 75%); }
+.room.daylight::before, .room.daylight.phone .scene-box::before { background: radial-gradient(ellipse 30% 45% at 55% 32%, rgba(200, 225, 255, .14), rgba(200, 225, 255, .04) 50%, transparent 75%); }
 .daylight .lamp .halo, .daylight .lamp .bulb { display: none; }
 .daylight .lamp .shade { background: linear-gradient(180deg, #d8c7a4, #b89c70); }
 .stage {
@@ -67,8 +67,21 @@ body {
   max-width: 1400px;
   margin: 0 auto;
 }
-/* wide enough: keep the whole room in one row and scale it like a picture */
+/* keep the whole room in one row and scale it like a picture */
 .stage.scene { width: 1673px; max-width: none; flex-wrap: nowrap; }
+.stage.scene .bookcase, .stage.scene .case-top-row { width: 600px; }
+.stage.scene .nook { width: 470px; }
+.stage.scene .piles-wrap { width: 330px; }
+/* on a phone the room fills the screen's height and scrolls sideways; the wall scrolls along with it */
+html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+.room.phone { display: flex; flex-direction: column; }
+.room.phone::before { display: none; }
+.room.phone .scroller { flex: 1; min-height: 0; overflow-x: auto; overflow-y: hidden; touch-action: pan-x; overscroll-behavior: contain; scrollbar-width: none; }
+.room.phone .scroller::-webkit-scrollbar { display: none; }
+.room.phone .scene-box { position: relative; width: max-content; background: repeating-linear-gradient(90deg, var(--wall) 0 46px, var(--wall-stripe) 46px 50px); }
+.room.phone .stage { margin: 0; }
+.room.phone .floor { width: 1673px; }
+.room.phone .credits { padding: 4px 12px 6px; font-size: 11.5px; line-height: 1.3; }
 .grounded { position: relative; }
 .grounded::after {
   content: "";
@@ -322,7 +335,7 @@ body {
 /* the lamp: click to switch it on or off, overriding the time of day until the next reload */
 .room.lamp-off .lamp .halo, .room.lamp-off .lamp .bulb { display: none; }
 .room.lamp-off .lamp .shade { background: linear-gradient(180deg, #d8c7a4, #b89c70); }
-.room.lamp-off:not(.daylight)::before { background: radial-gradient(ellipse 30% 45% at 55% 32%, rgba(150, 175, 230, .08), transparent 70%); }
+.room.lamp-off:not(.daylight)::before, .room.lamp-off.phone:not(.daylight) .scene-box::before { background: radial-gradient(ellipse 30% 45% at 55% 32%, rgba(150, 175, 230, .08), transparent 70%); }
 .room.daylight.lamp-on .lamp .halo, .room.daylight.lamp-on .lamp .bulb { display: block; }
 .room.daylight.lamp-on .lamp .shade { background: linear-gradient(180deg, #f6d9a0, #e8b46a); }
 .window .mullion-v, .window .mullion-h { pointer-events: none; }
@@ -657,14 +670,14 @@ body {
   .card-cover-img { width: 120px; }
 }
 
-@media (max-width: 640px) {
-  .curtain { width: 40px; }
-  .curtain.l { left: -42px; }
-  .curtain.r { right: -42px; }
-  .rod { left: -50px; right: -50px; }
-  .window { width: 220px; height: 180px; }
-  .furniture { flex-wrap: wrap; }
-  .lamp { display: none; }
+@media (max-width: 640px) {  /* only without scripts; otherwise the room is scaled whole */
+  .stage:not(.scene) .curtain { width: 40px; }
+  .stage:not(.scene) .curtain.l { left: -42px; }
+  .stage:not(.scene) .curtain.r { right: -42px; }
+  .stage:not(.scene) .rod { left: -50px; right: -50px; }
+  .stage:not(.scene) .window { width: 220px; height: 180px; }
+  .stage:not(.scene) .furniture { flex-wrap: wrap; }
+  .stage:not(.scene) .lamp { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -673,6 +686,7 @@ body {
 </head>
 <body>
 <main class="room" id="room">
+  <div class="scroller" id="scroller"><div class="scene-box" id="scene-box">
   <div class="stage">
     <section class="bookcase-wrap" aria-labelledby="read-label">
       <div class="case-deco" id="case-deco" aria-hidden="true"></div>
@@ -784,6 +798,7 @@ body {
     </a>
   </div>
   <div class="floor" aria-hidden="true"><div class="rug"></div><div class="floor-deco" id="floor-deco"></div></div>
+  </div></div>
   <footer class="credits">Shelves from <a href="https://bookwyrm.social/user/drkprmbs">bookwyrm.social/user/drkprmbs</a>, <span id="built"></span>.<span id="wx-credit"></span> Code on <a href="https://github.com/dirkprimbs/reading-room">GitHub</a>.</footer>
   <dialog class="card" id="card" aria-labelledby="card-title">
     <button class="card-close" id="card-close" type="button" aria-label="Close">&times;</button>
@@ -1306,20 +1321,73 @@ q.addEventListener("input", () => {
 
 // scale the room to the window instead of letting it wrap
 const stage = document.querySelector(".stage");
+// On a phone (narrow, or a touch screen where the room fitted to the width would be taller than the screen)
+// the room keeps its look: it fills the screen's height and scrolls sideways.
+const scroller = document.getElementById("scroller"), sceneBox = document.getElementById("scene-box");
+const floorEl = document.querySelector(".floor");
+const coarse = window.matchMedia("(pointer: coarse)");
 function fit() {
+  // the keyboard for the search box shrinks the screen; don't rescale the room under it
+  if (room.classList.contains("phone") && document.activeElement === q) return;
   const vw = document.documentElement.clientWidth;
-  const scene = vw >= 760;
-  stage.classList.toggle("scene", scene);
-  stage.style.zoom = scene ? Math.min(1, vw / 1673) : "";
-  document.querySelector(".floor").style.zoom = stage.style.zoom;
-  if (typeof layoutBookcase === "function" && shelves.clientWidth !== fit.caseWidth) {
+  stage.classList.add("scene");
+  const wasPhone = room.classList.contains("phone");
+  const centre = wasPhone ? (scroller.scrollLeft + scroller.clientWidth / 2) / scroller.scrollWidth : null;
+  stage.style.zoom = floorEl.style.zoom = 1;
+  if (shelves.clientWidth !== fit.caseWidth) {
     fit.caseWidth = shelves.clientWidth;
     layoutBookcase();
+  }
+  const height = sceneBox.getBoundingClientRect().height;
+  const widthZoom = Math.min(1, vw / 1673);
+  const phone = vw < 760 || (coarse.matches && widthZoom * height > window.innerHeight);
+  room.classList.toggle("phone", phone);
+  document.documentElement.classList.toggle("phone", phone);
+  room.style.height = phone ? window.innerHeight + "px" : "";
+  stage.style.zoom = floorEl.style.zoom = phone ? scroller.clientHeight / height : widthZoom;
+  if (phone) {
+    if (centre !== null) scroller.scrollLeft = centre * scroller.scrollWidth - scroller.clientWidth / 2;
+    else {  // start at the window
+      const w = document.querySelector(".window-wrap").getBoundingClientRect(), sr = scroller.getBoundingClientRect();
+      scroller.scrollLeft += w.left + w.width / 2 - sr.left - sr.width / 2;
+    }
   }
   hideTip();
 }
 window.addEventListener("resize", fit);
 fit();
+
+// On a phone a vertical swipe scrolls the room sideways too, and glides on a little; horizontal swipes scroll natively.
+let swipe = null, glideFrame = 0;
+scroller.addEventListener("touchstart", e => {
+  cancelAnimationFrame(glideFrame);
+  const p = e.touches[0];
+  swipe = e.touches.length === 1 && room.classList.contains("phone") ? { x: p.clientX, y: p.clientY, t: e.timeStamp, v: 0, mode: null } : null;
+}, { passive: true });
+scroller.addEventListener("touchmove", e => {
+  if (!swipe) return;
+  const p = e.touches[0], dx = p.clientX - swipe.x, dy = p.clientY - swipe.y;
+  if (!swipe.mode) {
+    if (Math.hypot(dx, dy) < 8) return;
+    swipe.mode = Math.abs(dy) > Math.abs(dx) ? "vertical" : "horizontal";
+  }
+  if (swipe.mode !== "vertical") return;
+  const step = -dy * 1.6;  // up moves along to the right
+  scroller.scrollLeft += step;
+  swipe.v = step / Math.max(1, e.timeStamp - swipe.t);
+  swipe.y = p.clientY; swipe.t = e.timeStamp;
+}, { passive: true });
+scroller.addEventListener("touchend", () => {
+  if (!swipe || swipe.mode !== "vertical" || reduceMotion) return;
+  let v = swipe.v, last = performance.now();
+  glideFrame = requestAnimationFrame(function glide(now) {
+    const dt = now - last;
+    last = now;
+    scroller.scrollLeft += v * dt;
+    v *= Math.pow(0.996, dt);
+    if (Math.abs(v) > 0.03) glideFrame = requestAnimationFrame(glide);
+  });
+});
 
 // the window: Toronto's sky for the time of day and, where the page may ask, the weather
 const TORONTO = { lat: 43.65, lon: -79.38 };

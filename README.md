@@ -46,6 +46,10 @@ Two ways out of the room: the half-open door (primbs.ca, "the rest of the house"
 
 The page includes a hidden preview panel (`--preview-controls`). Type `brain` on the page, or tap the model brain on the bookcase three times, to show or hide it. It isn't remembered: every load starts hidden, at the real time; "Back to now" resets a preview. It can also send a visitor or a streetcar right away and show the just-finished book.
 
+## On phones
+
+The room keeps its layout everywhere and is scaled like a picture. On a phone (or a touch screen where the room fitted to the width would be taller than the screen) it fills the screen's height instead and scrolls sideways, starting at the window; any swipe, up and down too, moves through the room, and taps still open books and work the room.
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
