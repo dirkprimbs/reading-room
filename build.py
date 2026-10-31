@@ -157,6 +157,13 @@ def outbox(d):
         page += 1
 
 
+def reading_goal(d):
+    """This year's reading goal from the public profile page: {"y": 2026, "n": 41, "of": 50}, or None."""
+    t = get(f"{BASE}/user/{USER}", os.path.join(d, "profile.html")).decode()
+    m = re.search(r'(\d{4}) Reading Goal</h2>.*?<progress[^>]*value="(\d+)"[^>]*max="(\d+)"', t, re.S)
+    return {"y": int(m.group(1)), "n": int(m.group(2)), "of": int(m.group(3))} if m else None
+
+
 def export_books(path):
     """Books from a BookWyrm account export: id -> book with rating, review and finish date."""
     with tarfile.open(path) as tf:
@@ -361,6 +368,9 @@ def collect(cache, export, refresh_descriptions=False, out_dir=None):
                 sc = spine_color(b["id"], cache)
                 if sc:
                     b["sc"] = sc
+    goal = reading_goal(cache)
+    if goal:
+        s["goal"] = goal
     s["built"] = datetime.date.today().isoformat()
     return s
 

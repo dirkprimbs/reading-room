@@ -23,6 +23,7 @@
       <option value="mar15">Mar 15 · Maple syrup</option>
       <option value="apr3">Apr 3 · Easter</option>
       <option value="may15">May 15 · Tulips</option>
+      <option value="may18">May 18 · Victoria Day (fireworks at night)</option>
       <option value="jun15">Jun 15 · Pride Month</option>
       <option value="jul1">Jul 1 · Canada Day</option>
       <option value="aug15">Aug 15 · Summer</option>
@@ -31,10 +32,13 @@
       <option value="oct20">Oct 20 · Halloween season</option>
       <option value="oct30">Oct 30 · Halloween</option>
       <option value="nov5">Nov 5 · Remembrance Day</option>
+      <option value="nov8">Nov 8 · Diwali</option>
       <option value="nov20">Nov 20 · Tea lights</option>
       <option value="dec2">Dec 2 · Advent, first candle</option>
+      <option value="dec7">Dec 7 · Hanukkah, fourth night</option>
       <option value="dec12">Dec 12 · Christmas</option>
       <option value="dec22">Dec 22 · Christmas, four candles</option>
+      <option value="dec31">Dec 31 · New Year's Eve (fireworks at night)</option>
     </select>
   </label>
   <label for="pv-phase">Time
@@ -47,7 +51,8 @@
       <option value="">Now</option><option>clear</option><option>cloudy</option><option>rain</option><option>snow</option><option>fog</option>
     </select>
   </label>
-  <div class="pv-buttons"><button type="button" id="pv-visit">Send a visitor</button><button type="button" id="pv-now">Back to now</button></div>
+  <div class="pv-buttons"><button type="button" id="pv-visit">Send a visitor</button><button type="button" id="pv-tram">Send a streetcar</button></div>
+  <div class="pv-buttons"><button type="button" id="pv-finished">Just finished</button><button type="button" id="pv-now">Back to now</button></div>
 </form>
 <script>
 (function () {
@@ -55,6 +60,9 @@
   const [date, phase, wx] = ["pv-date", "pv-phase", "pv-wx"].map(id => document.getElementById(id));
   pv.addEventListener("submit", e => e.preventDefault());
   document.getElementById("pv-visit").addEventListener("click", () => window.sendVisitor && window.sendVisitor());
+  document.getElementById("pv-tram").addEventListener("click", () => window.sendStreetcar && window.sendStreetcar());
+  // the latest finished book on the armchair, however long ago (reloads the page with ?finished)
+  document.getElementById("pv-finished").addEventListener("click", () => { location.search = "?finished"; });
   document.getElementById("pv-now").addEventListener("click", () => {
     date.value = phase.value = wx.value = "";
     history.replaceState(null, "", location.pathname + location.search);
