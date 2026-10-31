@@ -963,27 +963,30 @@ function layoutBookcase() {
     return parseFloat(sp.style.getPropertyValue("--w")) + 1;
   };
   const plan = ["plant", "photo", "bookend"];
-  const pack = limit => {  // fill each row up to the limit, in order
+  const pack = (limit, list = bookSlots) => {  // fill each row up to the limit, in order
     const rows = [];
     let i = 0;
-    while (i < bookSlots.length) {
+    while (i < list.length) {
       const deco = plan[rows.length];
       let used = deco ? DECO_WIDTH[deco] : 0;
       const books = [];
-      while (i < bookSlots.length && (books.length === 0 || used + width(bookSlots[i]) <= limit)) {
-        used += width(bookSlots[i]);
-        books.push(bookSlots[i++]);
+      while (i < list.length && (books.length === 0 || used + width(list[i]) <= limit)) {
+        used += width(list[i]);
+        books.push(list[i++]);
       }
       rows.push({ books, deco, used });
     }
     return rows;
   };
   const fits = rows => rows[rows.length - 1].used + DECO_WIDTH.brain <= capacity;
+  const needed = list => { const r = pack(capacity, list); return r.length + (fits(r) ? 0 : 1); };
+  // the bookcase has as many shelves as the most demanding sort order needs, so sorting never changes its size
+  const n = Math.max(needed(bookSlots), ...(layoutBookcase.orders || []).map(key =>
+    needed([...bookSlots].sort((a, b) => key(a.firstElementChild) - key(b.firstElementChild) || a.firstElementChild._i - b.firstElementChild._i))));
   let rows = pack(capacity);
-  if (!fits(rows)) {
-    // Norbert needs another shelf: rather than leave it empty, take a few books off each full shelf and move
-    // a handful down to him (the gaps they leave let the last books lean)
-    const n = rows.length + 1;
+  if (rows.length < n || !fits(rows)) {
+    // a shelf to spare: rather than leave the bottom one to Norbert alone, take a few books off each full shelf
+    // and move a handful down to him (the gaps they leave let the last books lean)
     let best = null;
     for (let limit = capacity - 1; limit > 0; limit--) {
       const r = pack(limit);
@@ -991,7 +994,8 @@ function layoutBookcase() {
       if (r.length === n && fits(r)) { best = r; if (r[n - 1].books.length >= 6) break; }  // a handful is enough
       else if (best) break;
     }
-    if (best) rows = best; else rows.push({ books: [], used: 0 });
+    if (best) rows = best;
+    else { if (!fits(rows)) rows.push({ books: [], used: 0 }); while (rows.length < n) rows.push({ books: [], used: 0 }); }
   }
   rows[rows.length - 1].brainFirst = true;
   const at = { plant: 0.72, photo: 0.18, bookend: 1 };  // where in the row each decoration stands
@@ -1115,7 +1119,8 @@ sortButton.addEventListener("click", () => {
   try { localStorage.setItem("reading-room-sort", sortBy); } catch (e) {}  // remembered for the next visit
   applySort();
 });
-if (sortBy !== "author") applySort();
+layoutBookcase.orders = Object.values(SORTS).map(s => s.key);
+applySort();
 
 // cardboard box: stopped reading
 const stopped = document.getElementById("stopped");
