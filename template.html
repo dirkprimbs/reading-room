@@ -221,6 +221,11 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 .plant .leaf:nth-child(3) { transform: rotate(32deg); }
 .plant .leaf:nth-child(4) { transform: rotate(-62deg); height: 30px; background: #6b9a52; }
 .plant .leaf:nth-child(5) { transform: rotate(60deg); height: 30px; background: #4f7a3e; }
+.plant .flower { position: absolute; left: 13px; bottom: 24px; width: 20px; height: 66px; transform-origin: 50% 100%; pointer-events: none; animation: plopp .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.plant .flower.going { animation: unplopp .35s ease-in forwards; }
+.plant .flower svg { display: block; overflow: visible; }
+@keyframes plopp { 0% { scale: 0; } 100% { scale: 1; } }
+@keyframes unplopp { 0% { scale: 1; } 30% { scale: 1.08; } 100% { scale: 0; } }
 .frame-photo { width: 78px; height: 62px; padding: 6px; background: #c9a46b; border-radius: 2px; transform: rotate(-3deg); box-shadow: 2px 3px 5px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,0,0,.2); }
 .frame-photo svg { display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
 /* clicked: a heart floats up like the cat's z's; three quick clicks, a burst of hearts */
@@ -228,6 +233,8 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 .deco-slot:has(.heart) { position: relative; z-index: 5; }  /* hearts in front of the neighbouring books */
 .heart { position: absolute; left: 50%; top: 4px; z-index: 6; pointer-events: none; color: #e8485f; font-size: 20px; line-height: 1; text-shadow: 0 1px 2px rgba(0,0,0,.35); animation: heart-float 1.6s ease-out forwards; }
 @keyframes heart-float { 0% { opacity: 0; translate: -50% 0; scale: .6; } 15% { opacity: 1; scale: 1; } 100% { opacity: 0; translate: calc(-50% + var(--dx)) -48px; } }
+.countdown { position: absolute; left: 50%; top: -4px; z-index: 6; pointer-events: none; font-family: var(--font-hand); font-weight: 700; font-size: 26px; line-height: 1; color: #efe2c8; text-shadow: 0 1px 3px rgba(0,0,0,.5); animation: heart-float 1.1s ease-out forwards; }
+.deco-slot:has(.countdown) { position: relative; z-index: 5; }
 .heart.burst { top: 40%; opacity: 0; animation: heart-burst 1.1s cubic-bezier(.2,.7,.3,1) forwards; }
 @keyframes heart-burst { 0% { opacity: 1; translate: -50% 0; scale: .3; } 60% { opacity: 1; } 100% { opacity: 0; translate: calc(-50% + var(--dx)) calc(var(--dy) + 14px); scale: 1; } }
 .brain { width: 88px; height: 68px; outline: none; border-radius: 4px; }
@@ -235,6 +242,8 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 .brain svg { display: block; }
 .bookend { width: 40px; height: 72px; }
 .bookend svg { display: block; filter: drop-shadow(1px 2px 2px rgba(0,0,0,.45)); }
+.bookend .lids { display: none; }
+.bookend.wiggle .lids { display: inline; }  /* the owl shuts its eyes while it wobbles */
 
 /* ---------- nook: plaque, window, lamp, chair, table ---------- */
 .nook { display: flex; flex-direction: column; align-items: center; gap: 30px; width: min(470px, calc(100vw - 40px)); }
@@ -958,6 +967,8 @@ const decor = {
     <path d="M6 68 C4 54 5 40 9 32 C7 26 7 18 10 12 L13 18 C16 15 24 15 27 18 L30 12 C33 18 33 26 31 32 C35 40 36 54 34 68 Z" fill="url(#brass)"/>
     <circle cx="15" cy="27" r="5" fill="#f3e3b0"/><circle cx="25" cy="27" r="5" fill="#f3e3b0"/>
     <circle cx="15.5" cy="27.5" r="2.4" fill="#2a1d12"/><circle cx="24.5" cy="27.5" r="2.4" fill="#2a1d12"/>
+    <g class="lids"><circle cx="15" cy="27" r="5.3" fill="#c9a45c"/><circle cx="25" cy="27" r="5.3" fill="#c9a45c"/>
+      <path d="M10.6 27 Q15 30.5 19.4 27 M20.6 27 Q25 30.5 29.4 27" stroke="#5a3e14" stroke-width="1.2" fill="none" stroke-linecap="round"/></g>
     <path d="M18.5 31 L20 35 L21.5 31 Z" fill="#6b4a1e"/>
     <path d="M12 44 q8 -5 16 0 M12 50 q8 -5 16 0 M13 56 q7 -4 14 0" stroke="#8a6a2e" stroke-width="1.4" fill="none"/>
     <path d="M10 66 l2 -3 l2 3 M26 66 l2 -3 l2 3" stroke="#6b5226" stroke-width="1.4" fill="none"/>
@@ -1803,6 +1814,34 @@ function renderDecor(t) {
 }
 
 // ---- click reactions: startle the cat, nudge decorations, scare pumpkins, blow leaves, switch the lamp
+function floatText(el, text, cls) {
+  const t = document.createElement("span");
+  t.className = cls;
+  t.textContent = text;
+  t.style.setProperty("--dx", "6px");
+  el.appendChild(t);
+  t.addEventListener("animationend", () => t.remove());
+  if (reduceMotion) setTimeout(() => t.remove(), 900);
+}
+function togglePlantFlower(plant) {
+  const old = plant.querySelector(".flower:not(.going)");
+  if (old) {
+    old.classList.add("going");
+    old.addEventListener("animationend", () => old.remove());
+    if (reduceMotion) old.remove();
+    return;
+  }
+  // a new colour every time: a hue away from the last one
+  const hue = plant._hue = ((plant._hue ?? Math.random() * 360) + 60 + Math.random() * 240) % 360;
+  const petal = `hsl(${hue.toFixed(0)} 75% 62%)`, deep = `hsl(${hue.toFixed(0)} 70% 48%)`;
+  const f = document.createElement("div");
+  f.className = "flower";
+  f.innerHTML = `<svg width="20" height="66" viewBox="0 0 20 66" aria-hidden="true">
+    <path d="M10 66 Q8 40 10 14" stroke="#4f7a3e" stroke-width="2" fill="none"/><path d="M9.4 42 Q3 38 2 32 Q8 33 9.6 40" fill="#5f8a4a"/>
+    ${[0, 72, 144, 216, 288].map(r => `<ellipse cx="10" cy="5.5" rx="4" ry="6" fill="${petal}" stroke="${deep}" stroke-width=".6" transform="rotate(${r} 10 12)"/>`).join("")}
+    <circle cx="10" cy="12" r="3.2" fill="#f2c12e"/><circle cx="10" cy="12" r="3.2" fill="none" stroke="#c8902a" stroke-width=".6"/></svg>`;
+  plant.insertBefore(f, plant.querySelector(".pot"));
+}
 function floatHeart(el) {
   const h = document.createElement("span");
   h.className = "heart";
@@ -1910,6 +1949,20 @@ room.addEventListener("click", e => {
   }
   const item = t.closest(".d-item, .deco");
   if (!item) return;
+  const quick = (ms = 700) => {  // clicks on this item within the last ms, this one included
+    const now = Date.now();
+    return (item._clicks = (item._clicks || []).filter(c => now - c < ms).concat(now)).length;
+  };
+  if (item.id === "brain-model" && document.getElementById("pv")) {  // Norbert counts down to the third tap, which opens the preview panel
+    const n = Math.min(3, quick(900));  // the panel's own window for three taps
+    if (n >= 3) item._clicks = [];
+    floatText(item, 4 - n + "\u2026", "countdown");
+    return replay(item, "wiggle", 800);
+  }
+  if (item.matches(".plant")) {  // three quick clicks: a flower pops out, three more and it's gone
+    if (quick() >= 3) { item._clicks = []; togglePlantFlower(item); }
+    return replay(item, "wiggle", 800);
+  }
   if (item.matches(".frame-photo")) {  // a heart for each click; three quick ones set off a burst
     if (reduceMotion) return;
     const now = Date.now();
