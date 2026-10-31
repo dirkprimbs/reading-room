@@ -196,7 +196,6 @@ body {
 }
 .spine.band::before { top: 6px; }
 .spine.band::after { bottom: 6px; }
-.spine.rated { box-shadow: inset 0 -5px 0 rgba(240, 196, 100, .9); }
 .book:hover, .book:focus-visible { filter: brightness(1.25); }
 .spine { transform: rotate(var(--lean, 0deg)); }
 .spine.leaning { transform-origin: bottom left; }
@@ -863,7 +862,6 @@ function makeBook(b, shelf, cls) {
   el.style.setProperty("--fg", inkFor(c));
   el._rand = r;
   el._book = b;
-  if (b.r) el.classList.add("rated");
   el._shelf = shelf;
   el._i = all.length;  // the order the build gave: by author
   all.push(el);
