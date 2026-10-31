@@ -34,13 +34,13 @@ Decorations follow the date in Toronto: in the window all year, and around the r
 
 The bookcase is laid out in the page, not by fixed positions: one decoration per shelf (plant, photo, bookend at the end of its row's books) and Norbert at the start of the bottom shelf, recalculated when the books or the window width change. The cat wakes up now and then; at dusk she watches the street from the windowsill, and from December to February she sleeps under a blanket. Birds (cardinals in winter, chickadees, blue jays, robins from spring to fall), squirrels in autumn (usually black ones, as in Toronto), monarchs and bees (May to September, by day), a moth (summer nights) or a raccoon peeking over the ledge (nights from March to November) visit the window; none in rain or fog. Now and then a red streetcar goes by.
 
-The fireplace burns from December to March and on freezing evenings. On its mantel, a jar of paper slips shows this year's reading goal, one slip per book in the colours of this year's books, and the clock above it keeps Toronto time. A tea mug steams while the lamp is on.
+At the end of the Canadiana shelf stand a clock that keeps Toronto time and a jar of paper slips for this year's reading goal, one slip per book in the colours of this year's books. A tea mug steams while the lamp is on.
 
 A book finished in the last seven days lies open over the armrest of the chair ("just finished!") before it goes onto its shelf. Add `?finished` to the address to see the latest one there anyway.
 
 The note by the bookcase switches the order between by author (A to Z) and by colour, a rainbow; the Canadiana shelf follows along. Every book has its own address: opening a card changes the address to `#book-<id>`, a link with it opens that card, and the card can copy the link.
 
-Things react to clicks: the cat startles, visitors fly off, decorations wobble or swing, floor leaves blow elsewhere, carved pumpkins turn scary for a second, the lamp and the fire switch on and off (until the next reload), the cat on the sill looks round, the streetcar rings, candles blow out and relight, string lights switch, the snow globe snows, the tree sparkles, bats flutter, the spider drops, and clicking the CN Tower sends a UFO to beam up a raccoon. Rows with room to spare let their last book lean against its neighbour.
+Things react to clicks: the cat startles, visitors fly off, decorations wobble or swing, floor leaves blow elsewhere, carved pumpkins turn scary for a second, the lamp switches on and off (until the next reload), the cat on the sill looks round, the streetcar rings, candles blow out and relight, string lights switch, the snow globe snows, the tree sparkles, bats flutter, the spider drops, and clicking the CN Tower sends a UFO to beam up a raccoon. Rows with room to spare let their last book lean against its neighbour.
 
 Two ways out of the room: the half-open door (primbs.ca, "the rest of the house") swings open, and the typewriter on the side table (Unprompted, the blog) types and dings, before the link opens in the same tab.
 

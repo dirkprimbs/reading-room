@@ -68,7 +68,7 @@ body {
   margin: 0 auto;
 }
 /* wide enough: keep the whole room in one row and scale it like a picture */
-.stage.scene { width: 1871px; max-width: none; flex-wrap: nowrap; }
+.stage.scene { width: 1673px; max-width: none; flex-wrap: nowrap; }
 .grounded { position: relative; }
 .grounded::after {
   content: "";
@@ -142,7 +142,6 @@ body {
   box-shadow: 0 0 0 2px #2a170b, 10px 14px 30px rgba(0,0,0,.55);
 }
 .shelf-row { display: flex; align-items: flex-end; width: 100%; height: var(--row); }
-.shelf-row .slot:first-child .spine.next-author { margin-left: 0; }
 .shelves {
   --row: 134px;
   --plank: 20px;
@@ -187,7 +186,6 @@ body {
   line-height: var(--w);
   text-align: center;
 }
-.spine.next-author { margin-left: 7px; }
 .spine.tilt { transform: rotate(-4deg); transform-origin: bottom left; margin-left: 6px; }
 .spine.band::before, .spine.band::after {
   content: "";
@@ -494,32 +492,19 @@ body {
 .door:hover .door-panel, .door:focus-visible .door-panel { transform: scaleX(.6); }
 .door.opening .door-panel { transform: scaleX(.12); transition-duration: .7s; }
 .door:focus-visible svg { outline: 2px solid var(--lamp); outline-offset: 3px; }
-/* ---------- fireplace: lit from December to March and on freezing evenings; the goal jar on the mantel ---------- */
-.hearth { position: relative; flex: none; display: flex; flex-direction: column; align-items: center; width: 180px; }
-.clock { width: 66px; height: 66px; margin-bottom: 34px; border-radius: 50%; filter: drop-shadow(3px 5px 6px rgba(0,0,0,.45)); }
-.clock svg { display: block; }
-.mantel { display: flex; align-items: flex-end; justify-content: space-between; width: 100%; padding: 0 16px; min-height: 10px; }
-.fireplace { position: relative; cursor: pointer; }
-.fireplace svg { display: block; overflow: visible; }
-.fireplace .flames, .fireplace .embers-glow { display: none; }
-.room.fire-lit .fireplace .flames, .room.fire-lit .fireplace .embers-glow { display: inline; }
-.flame-a, .flame-b, .flame-c { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 1.3s ease-in-out infinite alternate; }
-.flame-b { animation-duration: .9s; animation-delay: -.4s; }
-.flame-c { animation-duration: 1.1s; animation-delay: -.7s; }
-@keyframes flicker { 0% { transform: scale(1, 1) skewX(0); } 35% { transform: scale(.94, 1.08) skewX(3deg); } 70% { transform: scale(1.04, .92) skewX(-4deg); } 100% { transform: scale(.97, 1.04) skewX(2deg); } }
-.fire-glow { position: absolute; left: -110px; right: -110px; bottom: -40px; height: 220px; pointer-events: none; display: none; z-index: 3; mix-blend-mode: screen;
-  background: radial-gradient(ellipse 50% 50% at 50% 78%, rgba(255, 150, 60, .26), rgba(255, 130, 50, .08) 55%, transparent 75%); animation: glow-flicker 2.2s ease-in-out infinite alternate; }
-.room.fire-lit .fire-glow { display: block; }
-@keyframes glow-flicker { 0% { opacity: .85; } 40% { opacity: 1; } 60% { opacity: .78; } 100% { opacity: .95; } }
+/* ---------- on the Canadiana shelf: a mantel clock with Toronto time and the reading-goal jar ---------- */
+.clock { width: 58px; height: 74px; outline: none; filter: drop-shadow(2px 4px 4px rgba(0,0,0,.45)); }
+.clock svg { display: block; overflow: visible; }
+.clock:focus-visible { box-shadow: 0 0 0 2px var(--lamp); border-radius: 4px; }
+.pendulum { transform-box: view-box; transform-origin: 29px 54px; animation: pendulum 2s ease-in-out infinite alternate; }
+@keyframes pendulum { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+.shelves .shelf-extra { margin-left: auto; gap: 10px; padding-right: 4px; }
 .jar { width: 64px; height: 90px; outline: none; border-radius: 4px; }
 .jar svg { display: block; overflow: visible; }
 .jar:focus-visible { box-shadow: 0 0 0 2px var(--lamp); }
-/* a book finished in the last week, open and face down over the armrest */
-.open-book { position: absolute; right: -16px; top: 42px; width: 82px; height: 36px; font-size: 0; z-index: 2;
-  background: linear-gradient(90deg, rgba(0,0,0,.25), rgba(255,255,255,.12) 50%, rgba(0,0,0,.3)), var(--c);
-  clip-path: polygon(0 100%, 50% 0, 100% 100%); }
-.open-book::after { content: ""; position: absolute; left: 11%; right: 11%; bottom: 0; height: 76%;
-  background: repeating-linear-gradient(90deg, #f3ebd8 0 2px, #d6c8ac 2px 3px); clip-path: polygon(0 100%, 50% 0, 100% 100%); }
+/* a book finished in the last week, lying open on the armrest */
+.open-book { position: absolute; right: -14px; top: 60px; width: 80px; height: 30px; z-index: 2; background: none; filter: drop-shadow(0 3px 2px rgba(0,0,0,.4)); }
+.open-book svg { display: block; }
 .open-book:hover, .open-book:focus-visible { transform: translateY(-4px); }
 .just-tag { position: absolute; right: 4px; top: 6px; z-index: 3; font-size: 20px; transform: rotate(-8deg); pointer-events: none; white-space: nowrap; }
 /* the cat: under a blanket in winter, on the windowsill at dusk */
@@ -781,40 +766,6 @@ body {
       </div>
     </section>
 
-    <section class="hearth" aria-label="Fireplace and reading goal">
-      <div class="clock deco" id="clock"><svg width="66" height="66" viewBox="0 0 66 66" aria-hidden="true">
-        <circle cx="33" cy="33" r="32" fill="#6b4428"/><circle cx="33" cy="33" r="27" fill="#f3ead8"/>
-        <g stroke="#2a1d12" stroke-linecap="round"><line x1="33.0" y1="10.0" x2="33.0" y2="14.0" stroke-width="2.5"/><line x1="44.5" y1="13.1" x2="43.5" y2="14.8" stroke-width="1.4"/><line x1="52.9" y1="21.5" x2="51.2" y2="22.5" stroke-width="1.4"/><line x1="56.0" y1="33.0" x2="52.0" y2="33.0" stroke-width="2.5"/><line x1="52.9" y1="44.5" x2="51.2" y2="43.5" stroke-width="1.4"/><line x1="44.5" y1="52.9" x2="43.5" y2="51.2" stroke-width="1.4"/><line x1="33.0" y1="56.0" x2="33.0" y2="52.0" stroke-width="2.5"/><line x1="21.5" y1="52.9" x2="22.5" y2="51.2" stroke-width="1.4"/><line x1="13.1" y1="44.5" x2="14.8" y2="43.5" stroke-width="1.4"/><line x1="10.0" y1="33.0" x2="14.0" y2="33.0" stroke-width="2.5"/><line x1="13.1" y1="21.5" x2="14.8" y2="22.5" stroke-width="1.4"/><line x1="21.5" y1="13.1" x2="22.5" y2="14.8" stroke-width="1.4"/></g>
-        <line id="clock-h" x1="33" y1="35" x2="33" y2="19" stroke="#2a1d12" stroke-width="3" stroke-linecap="round"/>
-        <line id="clock-m" x1="33" y1="36" x2="33" y2="12" stroke="#2a1d12" stroke-width="2" stroke-linecap="round"/>
-        <line id="clock-s" x1="33" y1="38" x2="33" y2="10" stroke="#b3262c" stroke-width="1"/>
-        <circle cx="33" cy="33" r="2" fill="#2a1d12"/></svg></div>
-      <div class="mantel" id="mantel"></div>
-      <div class="fireplace grounded" id="fireplace" aria-hidden="true">
-        <svg width="180" height="206" viewBox="0 0 180 206">
-          <defs>
-            <pattern id="bricks" width="26" height="14" patternUnits="userSpaceOnUse"><rect width="26" height="14" fill="#8a4430"/>
-              <path d="M0 0.5 H26 M0 7.5 H26 M0.5 0 V7 M13.5 7 V14" stroke="#5e2c1f" stroke-width="1.2"/></pattern>
-            <radialGradient id="embers" cx="50%" cy="100%" r="80%"><stop offset="0" stop-color="#ff9a3a" stop-opacity=".75"/><stop offset=".6" stop-color="#c84a1a" stop-opacity=".25"/><stop offset="1" stop-color="#c84a1a" stop-opacity="0"/></radialGradient>
-          </defs>
-          <rect x="12" y="12" width="156" height="186" fill="url(#bricks)"/>
-          <path d="M40 198 V112 Q40 78 90 78 Q140 78 140 198 Z" fill="#140d09"/>
-          <path class="embers-glow" d="M40 198 V112 Q40 78 90 78 Q140 78 140 198 Z" fill="url(#embers)"/>
-          <g class="flames">
-            <path class="flame-a" d="M62 186 Q56 160 70 142 Q70 158 78 160 Q76 140 90 120 Q92 146 104 150 Q104 136 112 132 Q124 160 116 186 Z" fill="#e8641e"/>
-            <path class="flame-b" d="M70 186 Q66 166 78 154 Q80 166 86 166 Q86 150 94 138 Q98 160 108 162 Q114 176 108 186 Z" fill="#f5a02a"/>
-            <path class="flame-c" d="M80 186 Q78 174 86 166 Q88 174 92 174 Q94 164 98 158 Q104 174 100 186 Z" fill="#ffe08a"/>
-          </g>
-          <path d="M56 190 L124 182 L126 188 L58 196 Z" fill="#5a3a22"/><path d="M58 182 L122 192 L120 197 L56 188 Z" fill="#6e4628"/>
-          <circle cx="123" cy="187" r="4" fill="#3a2414"/><circle cx="57" cy="185" r="4" fill="#3a2414"/>
-          <path d="M44 198 V194 H136 V198" stroke="#2a2a2a" stroke-width="3" fill="none"/>
-          <rect x="0" y="0" width="180" height="14" rx="2" fill="#e6dcc6"/><rect x="6" y="14" width="168" height="5" fill="#cfc2a6"/>
-          <rect x="0" y="198" width="180" height="8" fill="#6b6058"/>
-        </svg>
-        <div class="fire-glow"></div>
-      </div>
-    </section>
-
     <a class="door grounded site-link" href="https://primbs.ca/" data-note="primbs.ca, the rest of the house" aria-label="primbs.ca, the rest of the house">
       <svg width="187" height="380" viewBox="0 0 124 252" aria-hidden="true">
         <defs><linearGradient id="hall" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9a65a"/><stop offset="1" stop-color="#ffdca8"/></linearGradient></defs>
@@ -961,10 +912,6 @@ function thickness(b, r, thin = 1) {
 }
 function addSpine(container, b, shelf, minH, spanH, thin = 1) {
   const el = makeBook(b, shelf, "spine");
-  // a little air between authors, so each author's books stand together
-  if (container._lastKey !== undefined && container._lastKey !== b.k) el.classList.add("next-author");
-  el._gap = el.classList.contains("next-author");
-  container._lastKey = b.k;
   const r = el._rand;
   el.style.setProperty("--w", thickness(b, r, thin) + "px");
   el.style.setProperty("--h", Math.round(minH + r() * spanH) + "px");
@@ -1000,7 +947,7 @@ function layoutBookcase() {
   const capacity = shelves.clientWidth - 20 - 2;  // padding, and a little slack for rounding
   const width = slot => {
     const sp = slot.firstElementChild;
-    return parseFloat(sp.style.getPropertyValue("--w")) + 1 + (sp.classList.contains("next-author") ? 7 : 0);
+    return parseFloat(sp.style.getPropertyValue("--w")) + 1;
   };
   const plan = ["plant", "photo", "bookend"];
   const rows = [];
@@ -1059,6 +1006,28 @@ layoutBookcase();
 const cn = document.getElementById("cn-shelf");
 readCanada.forEach(b => addSpine(cn, b, "Read", 66, 30, 0.8));
 const cnSlots = [...cn.children];
+// the clock and the goal jar stand together at the right end of the Canadiana shelf's last row
+const cnCorner = document.createElement("div");
+cnCorner.className = "slot deco-slot shelf-extra";
+cn.appendChild(cnCorner);
+const shelfExtra = el => cnCorner.appendChild(el);
+const clockEl = document.createElement("div");
+clockEl.className = "deco clock";
+clockEl.tabIndex = 0;
+clockEl.setAttribute("role", "img");
+clockEl.setAttribute("aria-label", "A clock showing Toronto time");
+clockEl.innerHTML = `<svg width="58" height="74" viewBox="0 0 58 74" aria-hidden="true">
+  <path d="M4 70 V32 Q4 4 29 4 Q54 4 54 32 V70 Z" fill="#6b4428"/><path d="M8 70 V32 Q8 8 29 8 Q50 8 50 32 V70" fill="none" stroke="#8a5a34" stroke-width="1.5"/>
+  <rect x="21" y="52" width="16" height="15" rx="2" fill="#2a1d12"/>
+  <g class="pendulum"><line x1="29" y1="54" x2="29" y2="62" stroke="#c9a45c" stroke-width="1"/><circle cx="29" cy="63" r="2.6" fill="#e2c27a"/></g>
+  <circle cx="29" cy="32" r="19" fill="#f3ead8" stroke="#c9a45c" stroke-width="2"/>
+  <g stroke="#2a1d12" stroke-linecap="round"><line x1="29.0" y1="16.0" x2="29.0" y2="19.5" stroke-width="2"/><line x1="37.0" y1="18.1" x2="36.0" y2="19.9" stroke-width="1.1"/><line x1="42.9" y1="24.0" x2="41.1" y2="25.0" stroke-width="1.1"/><line x1="45.0" y1="32.0" x2="41.5" y2="32.0" stroke-width="2"/><line x1="42.9" y1="40.0" x2="41.1" y2="39.0" stroke-width="1.1"/><line x1="37.0" y1="45.9" x2="36.0" y2="44.1" stroke-width="1.1"/><line x1="29.0" y1="48.0" x2="29.0" y2="44.5" stroke-width="2"/><line x1="21.0" y1="45.9" x2="22.0" y2="44.1" stroke-width="1.1"/><line x1="15.1" y1="40.0" x2="16.9" y2="39.0" stroke-width="1.1"/><line x1="13.0" y1="32.0" x2="16.5" y2="32.0" stroke-width="2"/><line x1="15.1" y1="24.0" x2="16.9" y2="25.0" stroke-width="1.1"/><line x1="21.0" y1="18.1" x2="22.0" y2="19.9" stroke-width="1.1"/></g>
+  <line id="clock-h" x1="29" y1="34" x2="29" y2="22" stroke="#2a1d12" stroke-width="2.4" stroke-linecap="round"/>
+  <line id="clock-m" x1="29" y1="35" x2="29" y2="17" stroke="#2a1d12" stroke-width="1.6" stroke-linecap="round"/>
+  <line id="clock-s" x1="29" y1="36" x2="29" y2="16" stroke="#b3262c" stroke-width=".8"/>
+  <circle cx="29" cy="32" r="1.6" fill="#2a1d12"/>
+  <rect x="1" y="69" width="56" height="5" rx="1.5" fill="#4a2d18"/></svg>`;
+shelfExtra(clockEl);
 
 // the sort switch: by author, A to Z (the build's order), or by the colour of the spines
 function colourKey(el) {
@@ -1076,9 +1045,9 @@ sortButton.addEventListener("click", () => {
   sortButton.firstElementChild.textContent = byColour ? "by colour" : "by author, A to Z";
   [bookSlots, cnSlots].forEach(list => {
     list.sort((a, b) => byColour ? colourKey(a.firstElementChild) - colourKey(b.firstElementChild) : a.firstElementChild._i - b.firstElementChild._i);
-    list.forEach(slot => slot.firstElementChild.classList.toggle("next-author", !byColour && slot.firstElementChild._gap));
   });
   cnSlots.forEach(slot => cn.appendChild(slot));
+  cn.appendChild(cnCorner);  // the clock and the jar stay at the end
   layoutBookcase();
 });
 
@@ -1106,6 +1075,11 @@ DATA.reading.forEach((b, i) => {
 if (justDone) {
   const el = makeBook(justDone, "Read", "open-book");
   el._just = true;
+  el.innerHTML = `<svg width="80" height="30" viewBox="0 0 80 30" aria-hidden="true">
+    <path d="M1 11 Q20 4 40 10 Q60 4 79 11 L79 27 Q60 21 40 28 Q20 21 1 27 Z" style="fill: var(--c)"/>
+    <path d="M4 9 Q21 2 40 8 L40 25 Q21 19 4 24 Z" fill="#f4ecda"/><path d="M76 9 Q59 2 40 8 L40 25 Q59 19 76 24 Z" fill="#ebe1cb"/>
+    <path d="M9 11 Q20 7 35 11 M9 14.5 Q20 10.5 35 14.5 M9 18 Q20 14 35 18 M9 21.5 Q18 18 28 20.5 M45 11 Q60 7 71 11 M45 14.5 Q60 10.5 71 14.5 M45 18 Q60 14 71 18"
+      stroke="#b8a888" stroke-width=".7" fill="none"/><path d="M40 8 V25" stroke="#c9b994" stroke-width=".8"/></svg>`;
   const tag = document.createElement("div");
   tag.className = "hand just-tag";
   tag.setAttribute("aria-hidden", "true");
@@ -1140,7 +1114,6 @@ document.getElementById("toread-count").textContent = "· " + DATA["to-read"].le
 document.getElementById("stopped-count").textContent = "· " + DATA["stopped-reading"].length;
 
 // the reading goal: a jar of paper slips, one for each book this year, in the colours of this year's books
-const mantel = document.getElementById("mantel");
 if (DATA.goal) {
   const { y, n, of } = DATA.goal;
   const colours = DATA.read.filter(b => (b.f || "").startsWith(y + "-") && b.sc).map(b => b.sc);
@@ -1167,7 +1140,7 @@ if (DATA.goal) {
     <g transform="rotate(8 47 36)"><path d="M39 30 H55 V44 H39 L36 37 Z" fill="#e8d6ae" stroke="#a8875a" stroke-width=".6"/>
       <text x="46.5" y="36" font-family="Caveat, cursive" font-weight="700" font-size="7" text-anchor="middle" fill="#3a2a17">${y}</text>
       <text x="46.5" y="42.5" font-family="Caveat, cursive" font-weight="700" font-size="6.5" text-anchor="middle" fill="#8a3b2b">${n}/${of}</text></g></svg>`;
-  mantel.appendChild(jar);
+  shelfExtra(jar);
   const note = `${y} reading goal: ${n} of ${of} books` + (n >= of ? ", done!" : "");
   ["mouseenter", "focus"].forEach(ev => jar.addEventListener(ev, () => showNote(jar, note)));
   ["mouseleave", "blur"].forEach(ev => jar.addEventListener(ev, () => hideTip()));
@@ -1315,7 +1288,7 @@ function fit() {
   const vw = document.documentElement.clientWidth;
   const scene = vw >= 760;
   stage.classList.toggle("scene", scene);
-  stage.style.zoom = scene ? Math.min(1, vw / 1871) : "";
+  stage.style.zoom = scene ? Math.min(1, vw / 1673) : "";
   document.querySelector(".floor").style.zoom = stage.style.zoom;
   if (typeof layoutBookcase === "function" && shelves.clientWidth !== fit.caseWidth) {
     fit.caseWidth = shelves.clientWidth;
@@ -1722,11 +1695,6 @@ room.addEventListener("click", e => {
   if (small) return replay(small, "wiggle", 800);
   const sillCat = t.closest(".sill-cat");
   if (sillCat) return replay(sillCat, "look", 1700);
-  if (t.closest(".fireplace")) {  // light it or put it out, until the next reload
-    room._fire = !room.classList.contains("fire-lit");
-    room.classList.toggle("fire-lit", room._fire);
-    return;
-  }
   const cat = t.closest(".cat");
   if (cat) return replay(cat, "startled", 9100);
   if (t.closest(".lamp")) {
@@ -1758,7 +1726,6 @@ room.addEventListener("click", e => {
 });
 
 // the wall clock keeps Toronto time
-const clockEl = document.getElementById("clock");
 function torontoTime() {
   const p = {};
   new Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto", hour: "numeric", minute: "numeric", second: "numeric", hourCycle: "h23" })
@@ -1767,18 +1734,18 @@ function torontoTime() {
 }
 function tickClock() {
   const p = torontoTime();
-  const turn = (id, deg) => { const hand = document.getElementById(id); if (hand) hand.setAttribute("transform", `rotate(${deg.toFixed(1)} 33 33)`); };
+  const turn = (id, deg) => { const hand = document.getElementById(id); if (hand) hand.setAttribute("transform", `rotate(${deg.toFixed(1)} 29 32)`); };
   turn("clock-h", (p.hour % 12 + p.minute / 60) * 30);
   turn("clock-m", (p.minute + p.second / 60) * 6);
   turn("clock-s", p.second * 6);
 }
-if (reduceMotion) document.getElementById("clock-s").remove();
+if (reduceMotion) document.getElementById("clock-s").remove();  // and the pendulum stands still (CSS)
 else setInterval(tickClock, 1000);
 setInterval(tickClock, 60e3);
 tickClock();
 ["mouseenter", "focus"].forEach(ev => clockEl.addEventListener(ev, () =>
   showNote(clockEl, "Toronto, " + new Date().toLocaleTimeString("en-CA", { timeZone: "America/Toronto", hour: "numeric", minute: "2-digit" }))));
-clockEl.addEventListener("mouseleave", hideTip);
+["mouseleave", "blur"].forEach(ev => clockEl.addEventListener(ev, hideTip));
 
 function applyLook() {
   // previews: #dusk, #night-snow, #dec24, #night-snow-dec24
@@ -1800,12 +1767,9 @@ function applyLook() {
   // tonight's moon, or the previewed date's at 10 pm Toronto time
   sky.shown.moon = moonAge(m && m[3] ? Date.UTC(t.y, t.m - 1, t.d, 26) : now);
   const occasion = renderDecor(t);
-  // the cat watches the street from the windowsill at dusk and sleeps under a blanket in winter;
-  // the fire burns from December to March and on freezing evenings
+  // the cat watches the street from the windowsill at dusk and sleeps under a blanket in winter
   room.classList.toggle("cat-out", phase === "dusk");
   room.classList.toggle("winter", t.m === 12 || t.m <= 2);
-  const freezing = !m && sky.temp != null && sky.temp <= 0 && phase !== "day";
-  room.classList.toggle("fire-lit", room._fire !== undefined ? room._fire : t.m === 12 || t.m <= 3 || freezing);
   sky.fireworks = fireworksDay(t);
   sky.frost = m && m[2] ? cond === "snow" : sky.temp != null && sky.temp <= -5;
   const base = m ? `Preview: ${[m[1] ? phase : "", m[2] || "", m[3] ? m[3] + " " + t.d : ""].filter(Boolean).join(", ")}` :
