@@ -187,15 +187,6 @@ body {
   text-align: center;
 }
 .spine.tilt { transform: rotate(-4deg); transform-origin: bottom left; margin-left: 6px; }
-.spine.band::before, .spine.band::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0;
-  height: 3px;
-  background: rgba(230, 190, 110, .75);
-}
-.spine.band::before { top: 6px; }
-.spine.band::after { bottom: 6px; }
 .book:hover, .book:focus-visible { filter: brightness(1.25); }
 .spine { transform: rotate(var(--lean, 0deg)); }
 .spine.leaning { transform-origin: bottom left; }
@@ -492,7 +483,7 @@ body {
 .door.opening .door-panel { transform: scaleX(.12); transition-duration: .7s; }
 .door:focus-visible svg { outline: 2px solid var(--lamp); outline-offset: 3px; }
 /* ---------- on top of the bookcase: a mantel clock with Toronto time, the wooden toy train and the reading-goal jar ---------- */
-.clock { width: 58px; height: 74px; outline: none; filter: drop-shadow(2px 4px 4px rgba(0,0,0,.45)); }
+.clock { width: 58px; height: 74px; outline: none; }
 .clock svg { display: block; overflow: visible; }
 .clock:focus-visible { box-shadow: 0 0 0 2px var(--lamp); border-radius: 4px; }
 .pendulum { transform-box: view-box; transform-origin: 29px 54px; animation: pendulum 2s ease-in-out infinite alternate; }
@@ -922,7 +913,6 @@ function addSpine(container, b, shelf, minH, spanH, thin = 1) {
   const r = el._rand;
   el.style.setProperty("--w", thickness(b, r, thin) + "px");
   el.style.setProperty("--h", Math.round(minH + r() * spanH) + "px");
-  if (r() < 0.35) el.classList.add("band");
   const slot = document.createElement("div");
   slot.className = "slot";
   slot.appendChild(el);
