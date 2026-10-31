@@ -51,7 +51,7 @@
       <option value="">Now</option><option>clear</option><option>cloudy</option><option>rain</option><option>snow</option><option>fog</option>
     </select>
   </label>
-  <div class="pv-buttons"><button type="button" id="pv-visit">Send a visitor</button><button type="button" id="pv-tram">Send a streetcar</button></div>
+  <div class="pv-buttons"><button type="button" id="pv-visit">Send a visitor</button><button type="button" id="pv-tram">Send a streetcar</button><button type="button" id="pv-hubert">Send Hubert</button></div>
   <div class="pv-buttons"><button type="button" id="pv-finished">Just finished</button><button type="button" id="pv-now">Back to now</button></div>
 </form>
 <script>
@@ -61,6 +61,7 @@
   pv.addEventListener("submit", e => e.preventDefault());
   document.getElementById("pv-visit").addEventListener("click", () => window.sendVisitor && window.sendVisitor());
   document.getElementById("pv-tram").addEventListener("click", () => window.sendStreetcar && window.sendStreetcar());
+  document.getElementById("pv-hubert").addEventListener("click", () => window.sendHubert && window.sendHubert());
   // the latest finished book on the armchair, however long ago (reloads the page with ?finished)
   document.getElementById("pv-finished").addEventListener("click", () => { location.search = "?finished"; });
   document.getElementById("pv-now").addEventListener("click", () => {

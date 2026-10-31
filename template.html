@@ -546,6 +546,21 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 @keyframes sc-look { 30%, 60% { transform: rotate(-16deg) translateX(-2px); } }
 .room.cat-out .chair .cat { display: none; }
 .room.cat-out .sill-cat { display: block; }
+/* Hubert, the vacuum robot, drives in: the cat hops up onto the sill and keeps a suspicious eye on him */
+.watch-cat { display: none; position: absolute; left: 35%; bottom: 0; z-index: 3; --look: 0; }
+.watch-cat svg { display: block; overflow: visible; }
+.watch-cat .wc-head { transform-box: fill-box; transform-origin: 50% 90%; rotate: calc(var(--look) * 9deg); transition: rotate .4s ease-out; }
+.watch-cat .wc-pupils { translate: calc(var(--look) * 2.2px) .5px; transition: translate .3s ease-out; }
+.watch-cat .wc-tail { transform-box: fill-box; transform-origin: 30% 0; animation: tail-nervous 2.3s ease-in-out infinite; }
+@keyframes tail-nervous { 0%, 100% { rotate: 0deg; } 12% { rotate: 16deg; } 22% { rotate: -6deg; } 30% { rotate: 10deg; } 46% { rotate: -14deg; } 58% { rotate: 4deg; } 70% { rotate: 18deg; } 84% { rotate: -9deg; } }
+.watch-cat.landing { animation: cat-land .35s ease-out; }
+@keyframes cat-land { 0% { translate: 0 -16px; opacity: 0; } 60% { translate: 0 2px; opacity: 1; } 100% { translate: 0 0; } }
+.chair .cat.hop { animation: cat-hop .35s ease-in forwards; }
+@keyframes cat-hop { 100% { translate: -10px -46px; opacity: 0; } }
+.room.hubert .chair .cat:not(.hop), .room.hubert .sill-cat { display: none; }
+.room.hubert .watch-cat { display: block; }
+.hubert-canvas { position: absolute; left: 0; top: -30px; width: 100%; height: 100px; z-index: 2; pointer-events: none; }
+.hubert-hit { position: absolute; z-index: 3; width: 70px; height: 44px; margin: -30px 0 0 -35px; display: none; }
 /* the sort switch, written next to the bookcase */
 .sort-switch { padding: 0; background: none; border: 0; cursor: pointer; text-decoration: underline dotted rgba(187, 166, 139, .6); text-underline-offset: 5px; }
 .sort-switch:hover small, .sort-switch:focus-visible small { color: var(--lamp); }
@@ -739,6 +754,20 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
           <g class="sc-head"><circle cx="22" cy="17" r="10" fill="#d88a45"/>
             <path d="M13 13 L13 1 L20 8 Z M31 13 L31 1 L24 8 Z" fill="#c87a3a"/><path d="M15 11 L15 5 L18 8 Z M29 11 L29 5 L26 8 Z" fill="#e8a8a0"/></g>
         </svg></div>
+        <div class="watch-cat" aria-hidden="true"><svg width="44" height="58" viewBox="0 0 44 58">
+          <path class="wc-tail" d="M30 52 Q36 60 34 70 Q33 76 37 80" stroke="#b96d2f" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <path d="M8 58 Q4 42 12 32 Q16 27 22 27 Q28 27 32 32 Q40 42 36 58 Z" fill="#c87a3a"/>
+          <path d="M16 58 Q14 44 22 38 Q30 44 28 58 Z" fill="#e8b07a"/>
+          <path d="M10 58 Q12 52 16 58 M28 58 Q32 52 34 58" stroke="#a8622a" stroke-width="1.6" fill="none"/>
+          <g class="wc-head"><path d="M12 15 L11 2 L19 9 Z M32 15 L33 2 L25 9 Z" fill="#c87a3a"/><path d="M13.5 12 L13 5 L17 9 Z M30.5 12 L31 5 L27 9 Z" fill="#e8a8a0"/>
+            <circle cx="22" cy="18" r="11" fill="#d88a45"/>
+            <path d="M13 13 Q17 11 19 14 M31 13 Q27 11 25 14" stroke="#a8622a" stroke-width="1.4" fill="none"/>
+            <g class="wc-eyes"><path d="M14 17.5 Q17.5 15.6 21 17.5 Q17.5 20 14 17.5 Z M23 17.5 Q26.5 15.6 30 17.5 Q26.5 20 23 17.5 Z" fill="#d8e05a"/>
+              <g class="wc-pupils" fill="#1a1410"><ellipse cx="17.5" cy="17.8" rx=".9" ry="1.5"/><ellipse cx="26.5" cy="17.8" rx=".9" ry="1.5"/></g>
+              <path d="M13.6 17 Q17.5 15.4 21.4 17 M22.6 17 Q26.5 15.4 30.4 17" stroke="#7a4420" stroke-width="1.3" fill="none"/></g>
+            <path d="M20.6 21.5 L23.4 21.5 L22 23 Z" fill="#e8a8a0"/><path d="M22 23 Q20.5 25 19 24.5 M22 23 Q23.5 25 25 24.5" stroke="#7a4420" stroke-width=".8" fill="none"/>
+            <path d="M12 21 L5 20 M12 23 L5 24 M32 21 L39 20 M32 23 L39 24" stroke="#f2e2c8" stroke-width=".5"/></g>
+        </svg></div>
       </div>
       <p class="wx hand" id="wx" aria-live="polite"></p>
 
@@ -812,7 +841,7 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
     </a>
     </div>
   </div>
-  <div class="floor" aria-hidden="true"><div class="rug"></div><div class="floor-deco" id="floor-deco"></div></div>
+  <div class="floor" aria-hidden="true"><div class="rug"></div><canvas class="hubert-canvas" id="hubert"></canvas><div class="hubert-hit" id="hubert-hit"></div><div class="floor-deco" id="floor-deco"></div></div>
   </div></div>
   <footer class="credits">Shelves from <a href="https://bookwyrm.social/user/drkprmbs">bookwyrm.social/user/drkprmbs</a>, <span id="built"></span>.<span id="wx-credit"></span> Code on <a href="https://github.com/dirkprimbs/reading-room">GitHub</a>.</footer>
   <dialog class="card" id="card" aria-labelledby="card-title">
@@ -1801,9 +1830,10 @@ function replay(el, cls, ms) {
 // A gust lifts the leaf a little and carries it sideways; then it sinks slowly, swinging side to side
 // like a pendulum and tilting with each swing. One smooth curve, computed per frame.
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-function gust(leaf) {
+const catOnSill = () => room.classList.contains("cat-out") || room.classList.contains("hubert");
+function gust(leaf, push) {  // push: { dir, T } when Hubert blows it up, to land behind him
   const floorWidth = leaf.parentElement.clientWidth;
-  let lift = 46, dir = Math.random() < 0.5 ? -1 : 1;
+  let lift = 46, dir = push && push.dir ? push.dir : Math.random() < 0.5 ? -1 : 1;
   if (leaf._flight) {
     // caught again in mid-air: start from where it is, with a fresh gust, maybe the other way
     const [tx, ty] = (leaf.style.translate || "0px 0px").split(" ").map(parseFloat);
@@ -1829,7 +1859,7 @@ function gust(leaf) {
     leaf._flight = null;
   };
   if (reduceMotion) return finish();
-  const T = 4600, RISE = 0.3, SWINGS = 1.5;
+  const T = push && push.T || 4600, RISE = 0.3, SWINGS = 1.5;
   const t0 = performance.now();
   (function frame(now) {
     if (leaf._flight !== flight) return;  // another gust took over
@@ -2009,7 +2039,7 @@ async function loadWeather() {
     const { phase, cond } = sky.shown || {};
     const m = sky.month || 1;
     if (cond === "rain" || cond === "fog") return null;
-    if (room.classList.contains("cat-out")) return null;  // nobody lands with the cat on the sill
+    if (catOnSill()) return null;  // nobody lands with the cat on the sill
     if (phase === "night") {
       const night = [];
       if (m >= 5 && m <= 9 && cond !== "snow") night.push("moth");
@@ -2238,7 +2268,7 @@ async function loadWeather() {
   function drawVisitor(t) {
     clock = t;
     if (still) return;
-    if (visitor && !visitor.flee && visitor.x !== undefined && room.classList.contains("cat-out"))  // the cat jumps up: off they go
+    if (visitor && !visitor.flee && visitor.x !== undefined && catOnSill())  // the cat jumps up: off they go
       visitor.flee = { t, x: visitor.x, y: visitor.y, rise: visitor.rise };
     if (visitor && (visitor.kind === "raccoon" || visitor.kind === "squirrel")) return drawCritter(t);
     if (visitor && visitor.flee) {  // startled by a click: off and away
@@ -2454,6 +2484,161 @@ window.addEventListener("hashchange", applyLook);
 setInterval(applyLook, 60e3);
 loadWeather();
 setInterval(loadWeather, 15 * 60e3);
+
+// Hubert, the vacuum robot: now and then he drives in from the right, wanders the floor in gentle curves,
+// bumps into the furniture (stop, back up a little, turn a bit, carry on), blows up the leaves he drives over
+// and leaves again. The cat watches him from the windowsill.
+(() => {
+  if (reduceMotion) return;
+  const cv = document.getElementById("hubert"), ctx = cv.getContext("2d"), hit = document.getElementById("hubert-hit");
+  const floor = cv.parentElement, chairCat = document.querySelector(".chair .cat"), watcher = document.querySelector(".watch-cat");
+  const R = 30, K = 0.42, H = 12, TOP = 30, SPEED = 42;  // half-size, depth squash, body height, canvas offset, px/s
+  let bot = null, next = performance.now() + 120e3 + Math.random() * 180e3, W = 0, dpr = 1;
+  window.sendHubert = () => { if (!bot) start(performance.now()); };
+  ["mouseenter", "focus"].forEach(ev => hit.addEventListener(ev, () => showNote(hit, "Hubert, the vacuum robot")));
+  hit.addEventListener("mouseleave", hideTip);
+
+  function start(now) {
+    W = floor.clientWidth; dpr = window.devicePixelRatio || 1;
+    cv.width = W * dpr; cv.height = 100 * dpr;
+    bot = { x: W + R + 10, y: 34 + Math.random() * 12, a: Math.PI + (Math.random() - 0.5) * 0.4, state: "drive", t: now, last: now,
+      start: now, stay: 55e3 + Math.random() * 30e3, turn: 0, eye: [{ x: 0, y: 0, vx: 0, vy: 0 }, { x: 0, y: 0, vx: 0, vy: 0 }], gone: false };
+    hit.style.display = "block";
+    // the cat has had enough: up onto the windowsill
+    chairCat.classList.add("hop");
+    setTimeout(() => {
+      room.classList.add("hubert");
+      chairCat.classList.remove("hop");
+      watcher.classList.remove("landing"); void watcher.offsetWidth; watcher.classList.add("landing");
+    }, 330);
+    requestAnimationFrame(frame);
+  }
+
+  // the outline seen from above, nose (flat, with the bumper) towards +x, rounded back
+  function outline(cx, cy, a, lift) {
+    const c = Math.cos(a), s = Math.sin(a), P = (px, py) => [cx + px * c - py * s, cy + (px * s + py * c) * K - lift];
+    const pts = [];
+    const arc = (ox, oy, r, a0, a1) => { for (let i = 0; i <= 6; i++) { const t = a0 + (a1 - a0) * i / 6; pts.push(P(ox + r * Math.cos(t), oy + r * Math.sin(t))); } };
+    arc(R - 4, R - 4, 4, 0, Math.PI / 2);            // front corners: nearly square
+    arc(-R + 16, R - 16, 16, Math.PI / 2, Math.PI);   // back corners: well rounded
+    arc(-R + 16, -R + 16, 16, Math.PI, Math.PI * 1.5);
+    arc(R - 4, -R + 4, 4, Math.PI * 1.5, Math.PI * 2);
+    ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
+  }
+  function draw(b, now) {
+    const y = b.y + TOP;
+    ctx.fillStyle = "rgba(0,0,0,.35)";  // shadow
+    ctx.beginPath(); ctx.ellipse(b.x, y + 2, R + 4, (R + 4) * K, 0, 0, Math.PI * 2); ctx.fill();
+    for (let l = 0; l < H; l++) { outline(b.x, y, b.a, l); ctx.fillStyle = l < 2 ? "#0e0f11" : "#1d1f22"; ctx.fill(); }
+    outline(b.x, y, b.a, H); ctx.fillStyle = "#1b1c1f"; ctx.fill();  // the black rim around the top
+    // the grey lid, inset from the rim, stopping short of the bumper at the front
+    const c = Math.cos(b.a), s = Math.sin(b.a), P = (px, py) => [b.x + px * c - py * s, y + (px * s + py * c) * K - H - 0.5];
+    ctx.beginPath();
+    [[R - 7, -R + 4], [R - 7, R - 4]].forEach(([px, py], i) => { const [X, Y] = P(px, py); i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); });
+    for (let i = 0; i <= 8; i++) { const t = Math.PI / 2 + Math.PI / 2 * i / 8; const [X, Y] = P(-R + 17 + 14 * Math.cos(t), R - 17 + 14 * Math.sin(t)); ctx.lineTo(X, Y); }
+    for (let i = 0; i <= 8; i++) { const t = Math.PI + Math.PI / 2 * i / 8; const [X, Y] = P(-R + 17 + 14 * Math.cos(t), -R + 17 + 14 * Math.sin(t)); ctx.lineTo(X, Y); }
+    ctx.closePath();
+    const g = ctx.createLinearGradient(b.x - R, y - H - R * K, b.x + R, y - H + R * K);
+    g.addColorStop(0, "#6c7076"); g.addColorStop(1, "#4b4e53");
+    ctx.fillStyle = g; ctx.fill();
+    // the Y-shaped button between the eyes, its stem pointing back
+    ctx.strokeStyle = "#b9bcc0"; ctx.lineWidth = 2.2; ctx.lineCap = "round";
+    const [yx, yy] = P(R - 13, 0), [s1x, s1y] = P(R - 9, -5), [s2x, s2y] = P(R - 9, 5), [s3x, s3y] = P(R - 20, 0);
+    ctx.beginPath(); ctx.moveTo(s1x, s1y); ctx.lineTo(yx, yy); ctx.lineTo(s2x, s2y); ctx.moveTo(yx, yy); ctx.lineTo(s3x, s3y); ctx.stroke();
+    // the logo, a little ( u ) towards the back
+    const [lx, ly] = P(-R * 0.35, 0);
+    ctx.strokeStyle = "rgba(230,232,235,.7)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.ellipse(lx, ly, 3.2, 3.2 * K + 0.6, 0, 0, Math.PI * 2); ctx.stroke();
+    // googly eyes: the pupils roll with every start, stop and turn
+    [-1, 1].forEach((side, i) => {
+      const [ex, ey] = P(R - 13, side * 12), e = b.eye[i];
+      ctx.fillStyle = "#f4f4f2"; ctx.beginPath(); ctx.ellipse(ex, ey - 1, 4.6, 3.6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,.35)"; ctx.lineWidth = .6; ctx.stroke();
+      ctx.fillStyle = "#18191b"; ctx.beginPath(); ctx.ellipse(ex + e.x, ey - 1 + e.y, 2.3, 2, 0, 0, Math.PI * 2); ctx.fill();
+    });
+    // the camera window in the bumper, when the nose turns towards us
+    if (s > 0.25) {
+      const [fx, fy] = P(R, 0);
+      ctx.fillStyle = "rgba(60,64,70," + Math.min(1, (s - 0.25) * 2).toFixed(2) + ")";
+      const w = 16 * s;
+      ctx.fillRect(fx - w / 2, fy + H * 0.3, w, H * 0.45);
+    }
+  }
+
+  function frame(now) {
+    const b = bot;
+    if (!b) return;
+    const dt = Math.min(0.05, (now - b.last) / 1000); b.last = now;
+    const leaving = now - b.start > b.stay;
+    let v = 0;
+    const turnTo = (dir, amount, wait) => { b.state = "bump"; b.t = now; b.turn = dir * amount; b.wait = wait; };
+    if (b.state === "drive") {
+      v = SPEED;
+      // not quite straight: a slow meander, and on the way out a pull to the right
+      b.a += Math.sin((now - b.start) / 1700) * 0.35 * dt;
+      if (leaving) { const d = Math.atan2(Math.sin(-b.a), Math.cos(-b.a)); if (Math.abs(d) > 0.5) b.a += Math.sign(d) * 0.9 * dt; }
+      const nx = b.x + Math.cos(b.a) * v * dt, ny = b.y + Math.sin(b.a) * v * dt * K;
+      const c = Math.cos(b.a), sn = Math.sin(b.a);  // only what he's driving towards counts
+      const back = sn < 0 && ny - R * K < 2, front = sn > 0 && ny + R * K > 66;
+      const left = c < 0 && nx - R < 4, right = c > 0 && !leaving && nx + R > W - 4;
+      if (back || left || right) {  // ran into the furniture or a wall: turn a little away from it
+        const away = back ? (Math.cos(b.a) >= 0 ? 1 : -1) : (Math.sin(b.a) >= 0 ? 1 : -1) * (left ? -1 : 1);
+        turnTo(away, 0.35 + Math.random() * 0.45, 450 + Math.random() * 300);
+      } else {
+        if (front) b.a += (Math.cos(b.a) >= 0 ? -1 : 1) * 1.6 * dt;  // the open edge: steer along it
+        b.x = nx; b.y = Math.min(ny, 66 - R * K);
+      }
+    } else if (b.state === "bump") {  // a moment's thought
+      if (now - b.t > b.wait) { b.state = "reverse"; b.t = now; }
+    } else if (b.state === "reverse") {
+      v = -SPEED * 0.6;
+      b.x += Math.cos(b.a) * v * dt; b.y = Math.max(R * K + 2, Math.min(66 - R * K, b.y + Math.sin(b.a) * v * dt * K));
+      if (now - b.t > 420) { b.state = "turn"; b.t = now; b.from = b.a; }
+    } else if (b.state === "turn") {
+      const q = Math.min(1, (now - b.t) / 600);
+      b.a = b.from + b.turn * q * q * (3 - 2 * q);
+      if (q >= 1) b.state = "drive";
+    }
+    // googly pupils: pushed back by speeding up, forward by braking, sideways by turning; gravity pulls them down
+    const acc = (v - (b.v || 0)) / Math.max(dt, 0.001); b.v = v;
+    b.eye.forEach(e => {
+      e.vx += (-acc * Math.cos(b.a) * 0.004 - e.x * 30) * dt; e.vy += (-acc * Math.sin(b.a) * 0.002 + 18 - e.y * 30) * dt;
+      e.vx *= 0.9; e.vy *= 0.9; e.x += e.vx * dt * 8; e.y += e.vy * dt * 8;
+      const d = Math.hypot(e.x, e.y); if (d > 1.6) { e.x *= 1.6 / d; e.y *= 1.6 / d; }
+    });
+    // leaves he drives over fly up and settle down behind him
+    if (b.state === "drive") floor.querySelectorAll(".floor-leaf").forEach(leaf => {
+      if (leaf._flight) return;
+      const lx = leaf.offsetLeft + 12, ly = leaf.offsetTop + 12;
+      if (Math.hypot(lx - b.x, (ly - b.y) / K) < R + 6) gust(leaf, { dir: Math.cos(b.a) >= 0 ? -1 : 1, T: 5600 });
+    });
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, 100);
+    draw(b, now);
+    hit.style.left = b.x + "px"; hit.style.top = b.y + "px";
+    // the cat follows him with her eyes
+    const wr = watcher.getBoundingClientRect(), fr = floor.getBoundingClientRect();
+    if (wr.width) watcher.style.setProperty("--look", Math.max(-1, Math.min(1, (fr.left + b.x * fr.width / W - wr.left - wr.width / 2) / (fr.width * 0.25))).toFixed(2));
+    if (leaving && b.x - R > W + 10) return stop(now);
+    requestAnimationFrame(frame);
+  }
+  function stop(now) {
+    bot = null;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    hit.style.display = "none"; hideTip();
+    setTimeout(() => { if (!bot) room.classList.remove("hubert"); }, 5000);  // she waits a little before coming down
+    next = now + 360e3 + Math.random() * 420e3;
+  }
+  // now and then, by day (he doesn't run at night)
+  setInterval(() => {
+    const now = performance.now();
+    if (!bot && now > next && !document.hidden) {
+      if (sky.shown && sky.shown.phase === "night") next = now + 600e3;
+      else start(now);
+    }
+  }, 5000);
+})();
+
 openFromHash();
 </script>
 __PREVIEW__
