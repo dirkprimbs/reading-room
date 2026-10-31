@@ -146,7 +146,7 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 .door-wrap { position: relative; flex: none; }
 .door-deco { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
 .d-door-wall { left: 50%; top: -110px; transform: translateX(-50%); }
-.d-door-banner { left: 50%; top: -150px; transform: translateX(-50%); }
+.d-door-banner { left: 50%; top: -118px; transform: translateX(-50%); }
 .d-floor { left: 0; right: 0; top: 4px; height: 60px; }
 .bookcase-top { display: flex; align-items: flex-end; justify-content: space-between; width: 100%; padding: 0 22px; }
 .bookcase {
@@ -223,6 +223,13 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 .plant .leaf:nth-child(5) { transform: rotate(60deg); height: 30px; background: #4f7a3e; }
 .frame-photo { width: 78px; height: 62px; padding: 6px; background: #c9a46b; border-radius: 2px; transform: rotate(-3deg); box-shadow: 2px 3px 5px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,0,0,.2); }
 .frame-photo svg { display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
+/* clicked: a heart floats up like the cat's z's; three quick clicks, a burst of hearts */
+.frame-photo { position: relative; }
+.deco-slot:has(.heart) { position: relative; z-index: 5; }  /* hearts in front of the neighbouring books */
+.heart { position: absolute; left: 50%; top: 4px; z-index: 6; pointer-events: none; color: #e8485f; font-size: 20px; line-height: 1; text-shadow: 0 1px 2px rgba(0,0,0,.35); animation: heart-float 1.6s ease-out forwards; }
+@keyframes heart-float { 0% { opacity: 0; translate: -50% 0; scale: .6; } 15% { opacity: 1; scale: 1; } 100% { opacity: 0; translate: calc(-50% + var(--dx)) -48px; } }
+.heart.burst { top: 40%; opacity: 0; animation: heart-burst 1.1s cubic-bezier(.2,.7,.3,1) forwards; }
+@keyframes heart-burst { 0% { opacity: 1; translate: -50% 0; scale: .3; } 60% { opacity: 1; } 100% { opacity: 0; translate: calc(-50% + var(--dx)) calc(var(--dy) + 14px); scale: 1; } }
 .brain { width: 88px; height: 68px; outline: none; border-radius: 4px; }
 .brain:focus-visible { box-shadow: 0 0 0 2px var(--lamp); }
 .brain svg { display: block; }
@@ -517,6 +524,8 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 @keyframes puff { 0% { opacity: .8; transform: translate(0, 0) scale(.5); } 100% { opacity: 0; transform: translate(10px, -26px) scale(1.6); } }
 .jar { width: 64px; height: 87px; outline: none; border-radius: 4px; }
 .jar svg { display: block; overflow: visible; }
+.jar.on-shelf { flex: none; margin: 0 6px 0 auto; }
+.jar-spot { width: 64px; }
 .jar:focus-visible { box-shadow: 0 0 0 2px var(--lamp); }
 /* a book finished in the last week, lying open on the armrest */
 .open-book { position: absolute; right: -14px; top: 60px; width: 80px; height: 30px; z-index: 2; background: none; filter: drop-shadow(0 3px 2px rgba(0,0,0,.4)); }
@@ -1003,6 +1012,16 @@ function layoutBookcase() {
     else { if (!fits(rows)) rows.push({ books: [], used: 0 }); while (rows.length < n) rows.push({ books: [], used: 0 }); }
   }
   rows[rows.length - 1].brainFirst = true;
+  // the goal jar stands at the right end of the top shelf when the books leave room, otherwise on top of the bookcase
+  const jar = document.querySelector(".jar"), JAR = 64 + 10;
+  const jarOnShelf = jar && rows.length > 1 && capacity - rows[0].used >= JAR;
+  if (jar) {
+    const top = document.getElementById("case-top-row");
+    let spot = top.querySelector(".jar-spot");
+    if (jarOnShelf && !spot) { spot = document.createElement("div"); spot.className = "jar-spot"; top.appendChild(spot); }  // keeps the train in the middle
+    if (!jarOnShelf) { if (spot) spot.remove(); top.appendChild(jar); }
+    jar.classList.toggle("on-shelf", jarOnShelf);
+  }
   const at = { plant: 0.72, photo: 0.18, bookend: 1 };  // where in the row each decoration stands
   shelves.innerHTML = "";
   bookSlots.forEach(slot => {
@@ -1016,7 +1035,7 @@ function layoutBookcase() {
     if (row.deco) items.splice(Math.round(at[row.deco] * row.books.length), 0, DECO_SLOTS[row.deco]);
     if (row.brainFirst) items.unshift(DECO_SLOTS.brain);
     // a row with room to spare: its last book leans back against its neighbour, foot out into the gap
-    const free = capacity - (row.used || 0) - (row.brainFirst ? DECO_WIDTH.brain : 0);
+    const free = capacity - (row.used || 0) - (row.brainFirst ? DECO_WIDTH.brain : 0) - (jarOnShelf && row === rows[0] ? JAR : 0);
     const lastSlot = items[items.length - 1];
     const prevSlot = items[items.length - 2];
     if (free >= 28 && lastSlot && bookSlots.includes(lastSlot) && prevSlot && bookSlots.includes(prevSlot)) {
@@ -1035,6 +1054,7 @@ function layoutBookcase() {
       sp.style.marginLeft = (pushFor(deg) - 1).toFixed(1) + "px";  // the neighbour's 1px margin
     }
     items.forEach(x => div.appendChild(x));
+    if (jarOnShelf && row === rows[0]) div.appendChild(jar);
     shelves.appendChild(div);
   });
 }
@@ -1683,7 +1703,7 @@ const DECOR = [
       const feather = (cx, rot) => `<g transform="rotate(${rot} ${cx} 30)">
         <ellipse cx="${cx}" cy="56" rx="6.5" ry="25" fill="url(#feather)" stroke="#1a1a1a" stroke-width=".8"/>
         <path d="M${cx} 31 V80" stroke="#1a1a1a" stroke-width=".7"/></g>`;
-      return `<svg width="264" height="137" viewBox="-6 -6 192 104">
+      return `<svg width="180" height="98" viewBox="-6 -6 192 104">
         <defs><clipPath id="pride-flag"><rect width="${W}" height="${H}"/></clipPath>
           <linearGradient id="feather" x1="0" y1="0" x2="0" y2="1"><stop offset=".62" stop-color="#ffffff"/><stop offset=".64" stop-color="#1a1a1a"/></linearGradient></defs>
         <rect x="2" y="3" width="${W}" height="${H}" fill="rgba(0,0,0,.35)"/>
@@ -1750,6 +1770,27 @@ function renderDecor(t) {
 }
 
 // ---- click reactions: startle the cat, nudge decorations, scare pumpkins, blow leaves, switch the lamp
+function floatHeart(el) {
+  const h = document.createElement("span");
+  h.className = "heart";
+  h.textContent = "\u2665";
+  h.style.setProperty("--dx", (Math.random() * 16 - 4).toFixed(0) + "px");
+  el.appendChild(h);
+  h.addEventListener("animationend", () => h.remove());
+}
+function heartBurst(el) {
+  for (let i = 0; i < 14; i++) {
+    const h = document.createElement("span"), a = i / 14 * Math.PI * 2 + Math.random() * 0.3, d = 50 + Math.random() * 30;
+    h.className = "heart burst";
+    h.textContent = "\u2665";
+    h.style.setProperty("--dx", (Math.cos(a) * d).toFixed(0) + "px");
+    h.style.setProperty("--dy", (Math.sin(a) * d - 20).toFixed(0) + "px");
+    h.style.animationDelay = (Math.random() * 120).toFixed(0) + "ms";
+    h.style.fontSize = (12 + Math.random() * 10).toFixed(0) + "px";
+    el.appendChild(h);
+    h.addEventListener("animationend", () => h.remove());
+  }
+}
 function replay(el, cls, ms) {
   el.classList.remove(cls);
   void el.getBoundingClientRect();  // restart the animation
@@ -1835,6 +1876,13 @@ room.addEventListener("click", e => {
   }
   const item = t.closest(".d-item, .deco");
   if (!item) return;
+  if (item.matches(".frame-photo")) {  // a heart for each click; three quick ones set off a burst
+    if (reduceMotion) return;
+    const now = Date.now();
+    item._clicks = (item._clicks || []).filter(c => now - c < 700).concat(now);
+    if (item._clicks.length >= 3) { item._clicks = []; return heartBurst(item); }
+    return floatHeart(item);
+  }
   const art = item.querySelector("[data-click]");
   switch (art && art.dataset.click) {
     case "candles": {  // each candle on its own
