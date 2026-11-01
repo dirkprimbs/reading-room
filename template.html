@@ -536,6 +536,57 @@ svg .part { transform-box: fill-box; }
 .train:focus-visible { box-shadow: 0 0 0 2px var(--lamp); }
 .train .puff { opacity: 0; transform-box: fill-box; transform-origin: center; }
 .chug { animation: chug 1.8s ease-in-out; }
+.train .wheel { transform-box: fill-box; transform-origin: center; }
+.chug .wheel { animation: wheel-spin .45s linear 4; }
+@keyframes wheel-spin { to { rotate: -360deg; } }
+.toot { position: absolute; z-index: 6; pointer-events: none; font-family: var(--font-hand); font-weight: 700; font-size: 22px; line-height: 1; color: #efe2c8; white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.5); animation: heart-float 1.6s ease-out forwards; }
+.train, .bookend, .jar { position: relative; }
+/* the goal jar, shaken */
+.jar.shake { animation: jar-shake .7s ease-in-out; transform-origin: 50% 100%; }
+@keyframes jar-shake { 10% { rotate: -9deg; } 25% { rotate: 8deg; } 40% { rotate: -7deg; } 55% { rotate: 6deg; } 70% { rotate: -3deg; } 85% { rotate: 2deg; } 100% { rotate: 0deg; } }
+.jar .slip { transition: transform .35s ease-out, fill .2s; }
+/* the owl hoots and looks round */
+.bookend.hoot { animation: bounce .9s ease-in-out; }
+.bookend .owl-pupils { transition: translate .25s ease-in-out; }
+.bookend.hoot .owl-pupils { animation: owl-look 1.6s ease-in-out; }
+@keyframes owl-look { 0%, 100% { translate: 0 0; } 20%, 40% { translate: -2px 0; } 60%, 80% { translate: 2px 0; } }
+/* the cat reaches out and nudges the mug towards the edge of the armrest */
+.cat-paw { position: absolute; left: 20px; top: 100px; width: 48px; height: 9px; z-index: 4; border-radius: 6px 4px 4px 6px; background: linear-gradient(180deg, #d88a45, #c87a3a); transform-origin: 100% 50%; scale: 0 1; pointer-events: none; }  /* from her shoulder up to the foot of the mug */
+.cat-paw.reach { animation: paw-reach 1.5s ease-in-out; }
+@keyframes paw-reach { 0% { scale: 0 1; rotate: 10deg; } 30% { scale: 1 1; rotate: 24deg; } 45% { scale: 1.1 1; rotate: 24deg; } 60% { scale: 1 1; rotate: 22deg; } 100% { scale: 0 1; rotate: 10deg; } }
+.mug { transition: translate .3s ease-out; }
+.mug.teeter { animation: mug-teeter 1.2s ease-in-out; transform-origin: 0 100%; }
+@keyframes mug-teeter { 15% { rotate: -14deg; } 35% { rotate: 8deg; } 55% { rotate: -6deg; } 75% { rotate: 3deg; } 100% { rotate: 0deg; } }
+.aside { position: absolute; left: 70%; top: -10px; z-index: 6; pointer-events: none; font-family: var(--font-hand); font-weight: 700; font-size: 19px; line-height: 1; color: #efe2c8; white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.5); animation: heart-float 2s ease-out forwards; }
+/* the clock's time-lapse: the hands race round while the window goes through a day */
+.clock #clock-h, .clock #clock-m { transform-origin: 29px 32px; }
+.clock.lapse #clock-h { animation: hand 4.6s linear infinite; }
+.clock.lapse #clock-m { animation: hand .383s linear infinite; }
+.clock.lapse #clock-s { visibility: hidden; }
+@keyframes hand { to { rotate: 360deg; } }
+/* disco: three clicks on the lamp */
+.disco-ball { position: absolute; left: 52%; top: 0; z-index: 12; width: 60px; margin-left: -30px; pointer-events: none; animation: disco-drop 7s ease-in-out forwards; }
+.disco-ball::before { content: ""; position: absolute; left: 29px; bottom: 58px; width: 2px; height: 600px; background: #8a8f96; }
+.disco-ball i { display: block; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 0 24px rgba(255,255,255,.45);
+  background: radial-gradient(circle at 34% 28%, rgba(255,255,255,.95), rgba(255,255,255,0) 28%),
+    repeating-linear-gradient(0deg, transparent 0 6px, rgba(40,50,60,.55) 6px 7px),
+    repeating-linear-gradient(90deg, #8f98a2 0 6px, #e8edf1 6px 7px, #bcc4cc 7px 12px, #f4f7f9 12px 13px, #a7b0b9 13px 19px, #dde3e8 19px 20px);
+  background-size: 100% 100%, 100% 100%, 40px 100%; animation: disco-spin 1s linear infinite; }
+@keyframes disco-spin { to { background-position: 0 0, 0 0, 40px 0; } }
+@keyframes disco-drop { 0% { translate: 0 -180px; } 15%, 85% { translate: 0 60px; } 100% { translate: 0 -180px; } }
+.disco-dim { position: fixed; inset: 0; z-index: 13; pointer-events: none; background: rgba(12, 4, 30, .38); opacity: 0; animation: disco-fade 7s linear forwards; }
+.disco-lights { position: fixed; inset: 0; z-index: 14; pointer-events: none; mix-blend-mode: screen; opacity: 0;
+  background-image: radial-gradient(circle, rgba(255,90,180,.7) 0 3px, rgba(255,90,180,0) 9px), radial-gradient(circle, rgba(90,200,255,.7) 0 2px, rgba(90,200,255,0) 8px),
+    radial-gradient(circle, rgba(255,230,100,.7) 0 3px, rgba(255,230,100,0) 10px), radial-gradient(circle, rgba(150,255,150,.6) 0 2px, rgba(150,255,150,0) 7px),
+    radial-gradient(circle, rgba(255,255,255,.6) 0 1.5px, rgba(255,255,255,0) 6px);
+  background-size: 173px 131px, 229px 163px, 137px 197px, 211px 113px, 157px 149px; background-position: 0 0, 41px 67px, 93px 23px, 19px 89px, 120px 40px;
+  animation: disco-fade 7s linear forwards, disco-move 3.2s linear infinite; }
+@keyframes disco-fade { 0%, 12% { opacity: 0; } 20%, 80% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes disco-move { to { background-position: 173px 0, -188px 67px, 230px 23px, -192px 89px, 277px 40px; } }
+.room.disco .deco, .room.disco .d-item:not(.d-rod):not(.d-door-banner) { animation: dance .46s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+.room.disco .d-rod, .room.disco .d-door-banner { animation: bounce .46s ease-in-out infinite; }
+.room.disco .chair .cat:not(.hop) { animation: dance .46s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+@keyframes dance { from { rotate: -6deg; translate: 0 0; } to { rotate: 6deg; translate: 0 -3px; } }
 .chug .puff { animation: puff 1.4s ease-out; }
 .chug .puff:nth-of-type(2) { animation-delay: .35s; }
 .chug .puff:nth-of-type(3) { animation-delay: .7s; }
@@ -865,6 +916,7 @@ svg .part { transform-box: fill-box; }
             <path d="M18 22 L9 21 M18 23.6 L9 24.6 M34 22 L43 21 M34 23.6 L43 24.6" stroke="#f2e2c8" stroke-width=".5"/></svg></div>
           <div class="skirt" aria-hidden="true"></div>
           <div class="leg l" aria-hidden="true"></div><div class="leg r" aria-hidden="true"></div>
+          <div class="cat-paw" aria-hidden="true"></div>
           <div class="mug" aria-hidden="true"><span class="steam a"></span><span class="steam b"></span></div>
         </div>
         <section class="table-wrap" aria-labelledby="reading-label">
@@ -1048,7 +1100,7 @@ const decor = {
     <path d="M2 68 H38 V72 H2 Z" fill="#6b5226"/>
     <path d="M6 68 C4 54 5 40 9 32 C7 26 7 18 10 12 L13 18 C16 15 24 15 27 18 L30 12 C33 18 33 26 31 32 C35 40 36 54 34 68 Z" fill="url(#brass)"/>
     <circle cx="15" cy="27" r="5" fill="#f3e3b0"/><circle cx="25" cy="27" r="5" fill="#f3e3b0"/>
-    <circle cx="15.5" cy="27.5" r="2.4" fill="#2a1d12"/><circle cx="24.5" cy="27.5" r="2.4" fill="#2a1d12"/>
+    <g class="owl-pupils"><circle cx="15.5" cy="27.5" r="2.4" fill="#2a1d12"/><circle cx="24.5" cy="27.5" r="2.4" fill="#2a1d12"/></g>
     <g class="lids"><circle cx="15" cy="27" r="5.3" fill="#c9a45c"/><circle cx="25" cy="27" r="5.3" fill="#c9a45c"/>
       <path d="M10.6 27 Q15 30.5 19.4 27 M20.6 27 Q25 30.5 29.4 27" stroke="#5a3e14" stroke-width="1.2" fill="none" stroke-linecap="round"/></g>
     <path d="M18.5 31 L20 35 L21.5 31 Z" fill="#6b4a1e"/>
@@ -1209,7 +1261,8 @@ clockEl.innerHTML = `<svg width="58" height="74" viewBox="0 0 58 74" aria-hidden
   <rect x="1" y="69" width="56" height="5" rx="1.5" fill="#4a2d18"/></svg>`;
 caseTop.appendChild(clockEl);
 // the wooden toy train: a locomotive, a carriage and a wagon of logs; click it and it chugs
-const wheel = (cx, cy, r, rim) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${rim}"/><circle cx="${cx}" cy="${cy}" r="${r * 0.68}" fill="#e6c98a"/><circle cx="${cx}" cy="${cy}" r="1.6" fill="#1a1a1a"/>`;
+const wheel = (cx, cy, r, rim) => `<g class="wheel"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${rim}"/><circle cx="${cx}" cy="${cy}" r="${r * 0.68}" fill="#e6c98a"/>` +
+  `<path d="M${cx - r * 0.6} ${cy} H${cx + r * 0.6} M${cx} ${cy - r * 0.6} V${cy + r * 0.6}" stroke="#c4a468" stroke-width="1.4"/><circle cx="${cx}" cy="${cy}" r="1.6" fill="#1a1a1a"/></g>`;
 const train = document.createElement("div");
 train.className = "deco train";
 train.tabIndex = 0;
@@ -1344,7 +1397,7 @@ if (DATA.goal) {
   for (let i = 0; i < Math.min(n, of + cols); i++) {  // past the goal, one more row heaps up at the rim
     const row = Math.floor(i / cols), x = 9.5 + (i % cols) * 6.4 + (row % 2) * 1.2, top = 64 - (row + 1) * slipH;
     const c = colours.length ? colours[i % colours.length] : CLOTH[i % CLOTH.length];
-    slips += `<rect x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="5.6" height="${Math.max(2.4, slipH - 0.7).toFixed(1)}" rx="1" fill="${c}" transform="rotate(${hash("slip" + i) % 36 - 18} ${(x + 2.8).toFixed(1)} ${(top + slipH / 2).toFixed(1)})"/>`;
+    slips += `<rect class="slip" x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="5.6" height="${Math.max(2.4, slipH - 0.7).toFixed(1)}" rx="1" fill="${c}" transform="rotate(${hash("slip" + i) % 36 - 18} ${(x + 2.8).toFixed(1)} ${(top + slipH / 2).toFixed(1)})"/>`;
   }
   const jar = document.createElement("div");
   jar.className = "deco jar";
@@ -2126,6 +2179,87 @@ function gust(leaf, push) {  // push: { dir, T } when Hubert blows it up, to lan
     if (s < 1) requestAnimationFrame(frame); else finish();
   })(t0);
 }
+// ---- clicks on the things on and in the bookcase, the cup, and the lamp's disco
+function noteAt(host, cls, text, x, y) {  // a little floating word, at a spot in host's own pixels
+  const n = document.createElement("span");
+  n.className = cls; n.textContent = text;
+  if (x != null) { n.style.left = x + "px"; n.style.top = y + "px"; }
+  host.appendChild(n);
+  n.addEventListener("animationend", () => n.remove());
+  if (reduceMotion) setTimeout(() => n.remove(), 1600);
+}
+function sound() {  // one shared audio context, made on the first click that needs it
+  const A = window.AudioContext || window.webkitAudioContext;
+  if (!A) return null;
+  const ac = sound.ac || (sound.ac = new A());
+  ac.resume();
+  return ac;
+}
+function hoot() {  // a soft owl: hoo... hoo-hoo
+  const ac = sound();
+  if (!ac) return;
+  [[0, 0.42], [0.62, 0.2], [0.86, 0.36]].forEach(([d, len]) => {
+    const t0 = ac.currentTime + 0.02 + d, o = ac.createOscillator(), g = ac.createGain(), v = ac.createOscillator(), vg = ac.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(410, t0); o.frequency.exponentialRampToValueAtTime(350, t0 + len);
+    v.frequency.value = 6; vg.gain.value = 6; v.connect(vg); vg.connect(o.frequency);  // a little wobble in the voice
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.22, t0 + 0.06); g.gain.exponentialRampToValueAtTime(0.0001, t0 + len);
+    o.connect(g); g.connect(ac.destination); o.start(t0); v.start(t0); o.stop(t0 + len + 0.05); v.stop(t0 + len + 0.05);
+  });
+}
+function owlHoot(owl) {
+  replay(owl, "hoot", 1600);
+  noteAt(owl, "toot", "hoo-hoo!", 30, -10);
+  hoot();
+}
+function trainToot(train) {
+  noteAt(train, "toot", "toot toot!", 26, -14);
+}
+function shakeJar(jar) {
+  replay(jar, "shake", 700);
+  setTimeout(() => {  // the slips settle in a new order
+    const slips = [...jar.querySelectorAll(".slip")], fills = slips.map(sl => sl.getAttribute("fill"));
+    for (let i = fills.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [fills[i], fills[j]] = [fills[j], fills[i]]; }
+    slips.forEach((sl, i) => {
+      const cx = +sl.getAttribute("x") + 2.8, cy = +sl.getAttribute("y") + +sl.getAttribute("height") / 2;
+      sl.setAttribute("fill", fills[i]);
+      sl.setAttribute("transform", `rotate(${(Math.random() * 40 - 20).toFixed(0)} ${cx.toFixed(1)} ${cy.toFixed(1)})`);
+    });
+  }, 300);
+}
+function nudgeMug(mug) {  // three quick clicks: the cat reaches over and pushes the mug towards the edge (it never falls)
+  const cat = document.querySelector(".chair .cat"), paw = document.querySelector(".cat-paw");
+  if (catOnSill() || room.classList.contains("storm") || cat.classList.contains("startled")) return replay(mug, "wiggle", 800);
+  replay(paw, "reach", 1500);
+  setTimeout(() => {
+    mug._nudge = Math.min(2, (mug._nudge || 0) + 1);
+    mug.style.translate = -mug._nudge * 4 + "px 0";
+    replay(mug, "teeter", 1200);
+  }, 560);
+  setTimeout(() => noteAt(cat, "aside", ["who, me?", "*innocent*", "oops."][Math.floor(Math.random() * 3)]), 1300);
+}
+function timeLapse() {  // three quick clicks on the clock: a whole day in the window in about ten seconds
+  if (sky.lapse || reduceMotion || !sky.shown) return;
+  const order = ["dawn", "day", "dusk", "night"], at = order.indexOf(sky.shown.phase);
+  const steps = [1, 2, 3, 4].map(k => order[(at + k) % 4]), STEP = 2300;  // round to where it started
+  logSee("timelapse");
+  clockEl.classList.add("lapse");
+  steps.forEach((ph, k) => setTimeout(() => { sky.lapse = ph; applyLook(); }, k * STEP));
+  setTimeout(() => { sky.lapse = null; clockEl.classList.remove("lapse"); tickClock(); applyLook(); }, steps.length * STEP);
+}
+function disco() {  // three quick clicks on the lamp: a disco ball comes down and everything dances for a few seconds
+  if (reduceMotion || document.querySelector(".disco-ball")) return;
+  logSee("disco");
+  const ball = document.createElement("div"), lights = document.createElement("div");
+  ball.className = "disco-ball"; ball.innerHTML = "<i></i>";
+  lights.className = "disco-lights";
+  const dim = document.createElement("div");
+  dim.className = "disco-dim";
+  document.querySelector(".stage").appendChild(ball);
+  document.body.append(dim, lights);
+  setTimeout(() => room.classList.add("disco"), 1000);
+  setTimeout(() => room.classList.remove("disco"), 6000);
+  setTimeout(() => { ball.remove(); lights.remove(); dim.remove(); }, 7100);
+}
 function cheerLeaf(leaf, tx, ty) {
   const host = leaf.parentElement, x = leaf.offsetLeft + tx + 12, y = leaf.offsetTop + ty;
   const note = document.createElement("span");
@@ -2172,13 +2306,29 @@ room.addEventListener("click", e => {
   if (t.closest(".floor") && !t.closest(".hubert-hit") && window.hubertCrumb && window.hubertCrumb(e)) return;
   const pumpkin = t.closest("svg.pumpkin");
   if (pumpkin) return replay(pumpkin, "scary", 1100);
-  const small = t.closest(".glasses, .mug");  // things on the table and the armrest
+  const tally = (el, ms = 700) => {  // clicks on el within the last ms, this one included
+    const now = Date.now();
+    return (el._clicks = (el._clicks || []).filter(c => now - c < ms).concat(now)).length;
+  };
+  const mug = t.closest(".mug");
+  if (mug) {
+    if (tally(mug) >= 3) { mug._clicks = []; return nudgeMug(mug); }
+    return replay(mug, "wiggle", 800);
+  }
+  const small = t.closest(".glasses");  // things on the table
   if (small) return replay(small, "wiggle", 800);
   const sillCat = t.closest(".sill-cat");
   if (sillCat) return replay(sillCat, "look", 1700);
   const cat = t.closest(".cat");
   if (cat) return replay(cat, "startled", 9100);
   if (t.closest(".lamp")) {
+    const lamp = t.closest(".lamp"), n = tally(lamp);
+    if (n === 1) lamp._was = [room.classList.contains("lamp-on"), room.classList.contains("lamp-off")];
+    if (n >= 3) {  // a party: put the lamp back the way it was, and down comes the disco ball
+      lamp._clicks = [];
+      room.classList.toggle("lamp-on", lamp._was[0]); room.classList.toggle("lamp-off", lamp._was[1]);
+      return disco();
+    }
     const on = room.classList.contains("lamp-on") || (!room.classList.contains("daylight") && !room.classList.contains("lamp-off"));
     room.classList.toggle("lamp-off", on);
     room.classList.toggle("lamp-on", !on);
@@ -2196,6 +2346,12 @@ room.addEventListener("click", e => {
     floatText(item, 4 - n + "\u2026", "countdown");
     return replay(item, "wiggle", 800);
   }
+  if (item.matches(".clock")) {
+    if (quick() >= 3) { item._clicks = []; timeLapse(); }
+    return replay(item, "wiggle", 800);
+  }
+  if (item.matches(".bookend")) return owlHoot(item);
+  if (item.matches(".jar")) return shakeJar(item);
   if (item.matches(".plant")) {  // three quick clicks: a flower pops out, three more and it's gone
     if (quick() >= 3) { item._clicks = []; togglePlantFlower(item); }
     return replay(item, "wiggle", 800);
@@ -2221,7 +2377,7 @@ room.addEventListener("click", e => {
     case "snowglobe": replay(art, "shaken", 3600); return replay(item, "wiggle", 800);
     case "tree": return replay(art, "sparkle", 3000);
     case "bats": return replay(art, "flutter", 2000);
-    case "train": return replay(art, "chug", 1900);
+    case "train": trainToot(item); return replay(art, "chug", 1900);
     case "spider":  // drop down the thread right now
       return document.getAnimations().forEach(a => {
         if (/^spider-(drop|thread|sway)$/.test(a.animationName) && art.contains(a.effect.target)) a.currentTime = 9600;
@@ -2265,6 +2421,7 @@ function applyLook() {
     phase = m[1];
     if (m[2]) [cond, clouds] = m[2] === "clear" ? ["clear", 1] : condFrom(m[2] === "storm" ? "thunderstorm" : m[2]);
   }
+  if (sky.lapse) phase = sky.lapse;  // the clock's time-lapse
   sky.shown = { phase, cond, clouds };
   room.classList.toggle("daylight", phase === "day");
   const note = document.getElementById("wx");
@@ -3028,6 +3185,8 @@ const LOG_ENTRIES = [
   ["flower", "Flowers", "grown in the plant on the bookcase", "\u{1F33C}"],
   ["hearts", "Heart fireworks", "sent from the photo", "\u{1F496}"],
   ["streetcar", "Streetcar bells", "rung on the street below", "\u{1F514}"],
+  ["timelapse", "Time-lapses", "a whole day, wound through on the clock", "\u{1F570}\uFE0F"],
+  ["disco", "Disco parties", "the lamp knows how", "\u{1FAA9}"],
   ["secret", "Norbert's secret", "found the backstage controls", "\u{1F9E0}"]
 ];
 const logDlg = document.getElementById("logdlg");
