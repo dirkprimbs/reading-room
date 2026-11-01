@@ -562,24 +562,9 @@ svg .part { transform-box: fill-box; }
 .clock #clock-h, .clock #clock-m, .clock #clock-s { transform-origin: 29px 32px; }
 .clock.lapse #clock-s { visibility: hidden; }
 /* disco: three clicks on the lamp */
-.disco-ball { position: absolute; left: 52%; top: 0; z-index: 12; width: 60px; margin-left: -30px; pointer-events: none; animation: disco-drop 7s ease-in-out forwards; }
-.disco-ball::before { content: ""; position: absolute; left: 29px; bottom: 58px; width: 2px; height: 600px; background: #8a8f96; }
-.disco-ball i { display: block; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 0 24px rgba(255,255,255,.45);
-  background: radial-gradient(circle at 34% 28%, rgba(255,255,255,.95), rgba(255,255,255,0) 28%),
-    repeating-linear-gradient(0deg, transparent 0 6px, rgba(40,50,60,.55) 6px 7px),
-    repeating-linear-gradient(90deg, #8f98a2 0 6px, #e8edf1 6px 7px, #bcc4cc 7px 12px, #f4f7f9 12px 13px, #a7b0b9 13px 19px, #dde3e8 19px 20px);
-  background-size: 100% 100%, 100% 100%, 40px 100%; animation: disco-spin 1s linear infinite; }
-@keyframes disco-spin { to { background-position: 0 0, 0 0, 40px 0; } }
-@keyframes disco-drop { 0% { translate: 0 -180px; } 15%, 85% { translate: 0 60px; } 100% { translate: 0 -180px; } }
 .disco-dim { position: fixed; inset: 0; z-index: 13; pointer-events: none; background: rgba(12, 4, 30, .38); opacity: 0; animation: disco-fade 7s linear forwards; }
-.disco-lights { position: fixed; inset: 0; z-index: 14; pointer-events: none; mix-blend-mode: screen; opacity: 0;
-  background-image: radial-gradient(circle, rgba(255,90,180,.7) 0 3px, rgba(255,90,180,0) 9px), radial-gradient(circle, rgba(90,200,255,.7) 0 2px, rgba(90,200,255,0) 8px),
-    radial-gradient(circle, rgba(255,230,100,.7) 0 3px, rgba(255,230,100,0) 10px), radial-gradient(circle, rgba(150,255,150,.6) 0 2px, rgba(150,255,150,0) 7px),
-    radial-gradient(circle, rgba(255,255,255,.6) 0 1.5px, rgba(255,255,255,0) 6px);
-  background-size: 173px 131px, 229px 163px, 137px 197px, 211px 113px, 157px 149px; background-position: 0 0, 41px 67px, 93px 23px, 19px 89px, 120px 40px;
-  animation: disco-fade 7s linear forwards, disco-move 3.2s linear infinite; }
+.disco-canvas { position: fixed; inset: 0; z-index: 14; pointer-events: none; }
 @keyframes disco-fade { 0%, 12% { opacity: 0; } 20%, 80% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes disco-move { to { background-position: 173px 0, -188px 67px, 230px 23px, -192px 89px, 277px 40px; } }
 .room.disco .deco, .room.disco .d-item:not(.d-rod):not(.d-door-banner) { animation: dance .46s ease-in-out infinite alternate; transform-origin: 50% 100%; }
 .room.disco .d-rod, .room.disco .d-door-banner { animation: bounce .46s ease-in-out infinite; }
 .room.disco .chair .cat:not(.hop) { animation: dance .46s ease-in-out infinite alternate; transform-origin: 50% 100%; }
@@ -2253,19 +2238,91 @@ function timeLapse() {  // three quick clicks on the clock: a whole day in the w
   const look = setInterval(applyLook, 120);  // the time of day changes as the hours fly
   setTimeout(() => { clearInterval(look); sky.lapse = null; clockEl.classList.remove("lapse"); tickClock(); applyLook(); }, sky.lapse.dur);
 }
-function disco() {  // three quick clicks on the lamp: a disco ball comes down and everything dances for a few seconds
-  if (reduceMotion || document.querySelector(".disco-ball")) return;
+function disco() {  // three quick clicks on the lamp: a mirror ball comes down, throws spots of light round the room, everything dances
+  if (reduceMotion || document.querySelector(".disco-canvas")) return;
   logSee("disco");
-  const ball = document.createElement("div"), lights = document.createElement("div");
-  ball.className = "disco-ball"; ball.innerHTML = "<i></i>";
-  lights.className = "disco-lights";
-  const dim = document.createElement("div");
-  dim.className = "disco-dim";
-  document.querySelector(".stage").appendChild(ball);
-  document.body.append(dim, lights);
-  setTimeout(() => room.classList.add("disco"), 1000);
-  setTimeout(() => room.classList.remove("disco"), 6000);
-  setTimeout(() => { ball.remove(); lights.remove(); dim.remove(); }, 7100);
+  const cv = document.createElement("canvas"), dim = document.createElement("div"), stage = document.querySelector(".stage");
+  cv.className = "disco-canvas"; dim.className = "disco-dim";
+  document.body.append(dim, cv);
+  const ctx = cv.getContext("2d"), dpr = window.devicePixelRatio || 1;
+  const size = () => { cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; };
+  size();
+  const T = 7000, DROP = 1100, t0 = performance.now();
+  const HUES = [330, 200, 50, 120, 280, 20, 0];
+  // the mirror tiles: rows of latitude, each with as many tiles as fit round it
+  const tiles = [];
+  for (let j = -7; j <= 7; j++) {
+    const lat = j / 8 * Math.PI / 2, n = Math.max(4, Math.round(26 * Math.cos(lat)));
+    for (let i = 0; i < n; i++) tiles.push({ lat, lon: i / n * Math.PI * 2, dl: Math.PI * 2 / n, glint: Math.random(), hue: HUES[(i + j * 3 + 21) % HUES.length] });
+  }
+  // the spots it throws: each at its own distance and angle, all sweeping round as the ball turns
+  const spots = Array.from({ length: 180 }, () => ({ a: Math.random() * Math.PI * 2, d: Math.random(), v: 0.12 + Math.random() * 0.14, s: 3 + Math.random() * 5, hue: HUES[Math.floor(Math.random() * HUES.length)], tw: Math.random() * 6 }));
+  const beams = Array.from({ length: 16 }, (_, i) => ({ a: i / 16 * Math.PI * 2 + Math.random() * 0.3, d: 0.6 + Math.random() * 0.4, w: 2 + Math.random() * 4, hue: HUES[i % HUES.length] }));
+  room.classList.add("disco-on");
+  setTimeout(() => room.classList.add("disco"), DROP);
+  (function frame(now) {
+    const e = now - t0;
+    if (e > T) { cv.remove(); dim.remove(); room.classList.remove("disco", "disco-on"); return; }
+    if (cv.width !== innerWidth * dpr) size();
+    const sr = stage.getBoundingClientRect(), z = sr.width / 1673;
+    const ease = q => q * q * (3 - 2 * q);
+    const down = e < DROP ? ease(e / DROP) : e > T - DROP ? ease((T - e) / DROP) : 1;
+    const party = Math.min(1, Math.max(0, (e - DROP) / 600)) * Math.min(1, Math.max(0, (T - DROP - e) / 600));
+    const R = 50 * z, cx = sr.left + sr.width * 0.52, cy = sr.top - R * 2 + (150 * z + R * 2) * down, spin = e / 1000 * 1.3;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    // spots and a few beams, coming from the ball
+    if (party > 0) {
+      const reach = Math.hypot(innerWidth, innerHeight) * 0.75;
+      ctx.globalCompositeOperation = "lighter";
+      beams.forEach(b => {
+        const a = b.a + spin * 0.5, x = cx + Math.cos(a) * b.d * reach, y = cy + Math.sin(a) * b.d * reach;
+        const g = ctx.createLinearGradient(cx, cy, x, y);
+        g.addColorStop(0, `hsla(${b.hue} 100% 75% / ${0.5 * party})`); g.addColorStop(1, `hsla(${b.hue} 100% 60% / 0)`);
+        ctx.strokeStyle = g; ctx.lineWidth = b.w * z + 1;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+      });
+      spots.forEach(p => {  // little squares of light flying out from the ball, growing as they go
+        const q = (p.d + e / 1000 * p.v) % 1, a = p.a + spin * 0.5, d = R * 1.1 + q * reach, x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d;
+        const r = p.s * z * (0.5 + 2.2 * q), tw = 0.65 + 0.35 * Math.sin(now / 140 + p.tw), alpha = party * tw * Math.min(1, q * 6);
+        ctx.setTransform(dpr * Math.cos(a), dpr * Math.sin(a), -dpr * Math.sin(a), dpr * Math.cos(a), dpr * x, dpr * y);
+        ctx.fillStyle = `hsla(${p.hue} 100% 60% / ${(0.12 * alpha).toFixed(3)})`;  // a soft glow round it (cheaper than shadowBlur)
+        ctx.fillRect(-r * 2.2, -r * 1.1, r * 4.4, r * 2.2);
+        ctx.fillStyle = `hsla(${p.hue} 100% 72% / ${(0.85 * alpha).toFixed(3)})`;
+        ctx.fillRect(-r * 1.3, -r / 2, r * 2.6, r);  // stretched along the ray, as if streaking outwards
+      });
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalCompositeOperation = "source-over";
+    }
+    // the string, then the ball: a sphere of little mirrors, turning
+    ctx.strokeStyle = "#8a8f96"; ctx.lineWidth = 1.5 * z;
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, cy - R); ctx.stroke();
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
+    const base = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+    base.addColorStop(0, "#d9dee4"); base.addColorStop(0.6, "#7d858f"); base.addColorStop(1, "#2a2e34");
+    ctx.fillStyle = base; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+    tiles.forEach(tl => {
+      const lon = tl.lon + spin, c = Math.cos(lon);
+      if (c <= 0.05) return;  // round the back
+      const x = cx + R * Math.cos(tl.lat) * Math.sin(lon), y = cy + R * Math.sin(tl.lat);
+      const w = R * Math.cos(tl.lat) * tl.dl * c * 0.86, h = R * (Math.PI / 16) * Math.cos(tl.lat) * 0.86;
+      const light = 0.35 + 0.65 * Math.max(0, c * 0.6 - Math.sin(tl.lat) * 0.5 - Math.sin(lon) * 0.3);
+      const flash = Math.sin(now / 90 + tl.glint * 40) > 0.93;  // a tile catching the light
+      ctx.fillStyle = flash ? `hsl(${tl.hue} 100% 80%)` : `hsl(210 8% ${(25 + 60 * light).toFixed(0)}%)`;
+      ctx.fillRect(x - w / 2, y - h / 2, w, h);
+    });
+    const shine = ctx.createRadialGradient(cx - R * 0.4, cy - R * 0.45, 0, cx - R * 0.4, cy - R * 0.45, R * 0.5);
+    shine.addColorStop(0, "rgba(255,255,255,.85)"); shine.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = shine; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+    ctx.restore();
+    if (party > 0) {  // its own glow
+      const glow = ctx.createRadialGradient(cx, cy, R * 0.8, cx, cy, R * 2.2);
+      glow.addColorStop(0, `rgba(255,255,255,${0.25 * party})`); glow.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(cx, cy, R * 2.2, 0, Math.PI * 2); ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  })(t0);
 }
 function cheerLeaf(leaf, tx, ty) {
   const host = leaf.parentElement, x = leaf.offsetLeft + tx + 12, y = leaf.offsetTop + ty;
