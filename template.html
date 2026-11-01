@@ -150,6 +150,9 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 .treat { position: absolute; z-index: 4; line-height: 0; cursor: pointer; }
 .treat.found { pointer-events: none; animation: treat-found .45s ease-in forwards; }
 @keyframes treat-found { 35% { scale: 1.35; translate: 0 -8px; } 100% { scale: .2; opacity: 0; translate: 0 -22px; } }
+.cheer { position: absolute; z-index: 7; pointer-events: none; font-family: var(--font-hand); font-weight: 700; font-size: 34px; line-height: 1; color: var(--lamp); white-space: nowrap; text-shadow: 0 2px 4px rgba(0,0,0,.6); animation: cheer 2.2s ease-out forwards; }
+@keyframes cheer { 0% { opacity: 0; translate: -50% 10px; scale: .5; } 15% { opacity: 1; scale: 1.15; } 30% { scale: 1; } 80% { opacity: 1; } 100% { opacity: 0; translate: -50% -40px; } }
+.confetti-leaf { position: absolute; z-index: 6; pointer-events: none; line-height: 0; opacity: 0; animation: heart-burst 1.4s cubic-bezier(.2,.7,.3,1) forwards; }
 .hunt-count { position: absolute; z-index: 6; pointer-events: none; font-family: var(--font-hand); font-weight: 700; font-size: 24px; line-height: 1; color: #efe2c8; white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.5); animation: heart-float 1.4s ease-out forwards; }
 .d-door-boots { left: 50%; bottom: -24px; transform: translateX(-50%); }
 .d-floor { left: 0; right: 0; top: 4px; height: 60px; }
@@ -612,6 +615,7 @@ svg .part { transform-box: fill-box; }
 .log-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
 .log-list li { display: grid; grid-template-columns: 46px 1fr; gap: 8px; align-items: center; min-height: 46px; }
 .log-list img { width: 46px; height: 46px; object-fit: contain; }
+.log-list li.log-section { display: block; grid-column: 1 / -1; min-height: 0; margin-top: 12px; font-family: var(--font-hand); font-size: 24px; font-weight: 700; color: #4a2d18; border-bottom: 1px solid rgba(90, 68, 48, .25); }
 .log-list li.unseen img { filter: brightness(0) opacity(.28); }
 .log-list b { display: block; font-size: 15px; }
 .log-list small { display: block; font-size: 13px; color: #7a6450; line-height: 1.25; }
@@ -929,7 +933,7 @@ svg .part { transform-box: fill-box; }
   <footer class="credits">Shelves from <a href="https://bookwyrm.social/user/drkprmbs">bookwyrm.social/user/drkprmbs</a>, <span id="built"></span>.<span id="wx-credit"></span> Code on <a href="https://github.com/dirkprimbs/reading-room">GitHub</a>.</footer>
   <dialog class="card logdlg" id="logdlg" aria-labelledby="log-title">
     <button class="card-close" id="log-close" type="button" aria-label="Close">&times;</button>
-    <div><h2 class="hand" id="log-title">Visitors' log</h2><p class="log-sub">Who has come by while the room was open in this browser.</p>
+    <div><h2 class="hand" id="log-title">Visitors' log</h2><p class="log-sub">Who has come by, and what has happened, while the room was open in this browser.</p>
     <ul class="log-list" id="log-list"></ul></div>
   </dialog>
   <dialog class="card" id="card" aria-labelledby="card-title">
@@ -1998,6 +2002,7 @@ function findTreat(el) {
   const note = document.createElement("span");
   note.className = "hunt-count";
   note.textContent = n === total ? "All found!" : `${n} of ${total}`;
+  if (n === total) logSee("eggs");
   note.style.left = el.offsetLeft - 10 + "px";
   note.style.top = el.offsetTop - 24 + "px";
   el.parentElement.appendChild(note);
@@ -2028,6 +2033,7 @@ function togglePlantFlower(plant) {
   // a new colour every time: a hue away from the last one
   const hue = plant._hue = ((plant._hue ?? Math.random() * 360) + 60 + Math.random() * 240) % 360;
   const petal = `hsl(${hue.toFixed(0)} 75% 62%)`, deep = `hsl(${hue.toFixed(0)} 70% 48%)`;
+  logSee("flower");
   const f = document.createElement("div");
   f.className = "flower";
   f.innerHTML = `<svg width="20" height="66" viewBox="0 0 20 66" aria-hidden="true">
@@ -2045,6 +2051,7 @@ function floatHeart(el) {
   h.addEventListener("animationend", () => h.remove());
 }
 function heartBurst(el) {
+  logSee("hearts");
   for (let i = 0; i < 14; i++) {
     const h = document.createElement("span"), a = i / 14 * Math.PI * 2 + Math.random() * 0.3, d = 50 + Math.random() * 30;
     h.className = "heart burst";
@@ -2089,6 +2096,7 @@ function gust(leaf, push) {  // push: { dir, T } when Hubert blows it up, to lan
   leaf._flight = flight;
   leaf._dir = dir;
   const finish = () => {
+    leaf._topped = false;
     leaf.style.left = pct(dir).toFixed(1) + "%";
     leaf.style.top = newTop + "px";
     leaf.style.rotate = (rot + dir * 90).toFixed(1) + "deg";
@@ -2111,8 +2119,39 @@ function gust(leaf, push) {  // push: { dir, T } when Hubert blows it up, to lan
     const tilt = 32 * Math.sin(Math.PI * u) * Math.cos(2 * Math.PI * SWINGS * u);
     leaf.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`;
     leaf.style.rotate = (rot + dir * 90 * s + tilt).toFixed(1) + "deg";
+    if (!leaf._topped && !push) {  // kept aloft all the way up to the top of the room: applause
+      const lr = leaf.getBoundingClientRect(), top = Math.max(document.getElementById("scene-box").getBoundingClientRect().top, 0);
+      if (lr.top < top + 24) { leaf._topped = true; cheerLeaf(leaf, x, y); }
+    }
     if (s < 1) requestAnimationFrame(frame); else finish();
   })(t0);
+}
+function cheerLeaf(leaf, tx, ty) {
+  const host = leaf.parentElement, x = leaf.offsetLeft + tx + 12, y = leaf.offsetTop + ty;
+  const note = document.createElement("span");
+  note.className = "cheer";
+  note.textContent = ["To the top!", "Woohoo!", "Leaf champion!", "What a gust!"][Math.floor(Math.random() * 4)];
+  note.style.left = x + "px"; note.style.top = y + 10 + "px";
+  host.appendChild(note);
+  note.addEventListener("animationend", () => note.remove());
+  const colours = ["#c8402a", "#e8892a", "#d9a42a", "#a8322a", "#f2c12e"];
+  for (let i = 0; i < 16; i++) {  // a burst of little leaves
+    const c = document.createElement("span"), a = i / 16 * Math.PI * 2 + Math.random() * 0.3, d = 50 + Math.random() * 40;
+    c.className = "confetti-leaf";
+    c.innerHTML = `<svg width="12" height="12" viewBox="0 0 20 20"><path d="${LEAF}" fill="${colours[i % 5]}"/></svg>`;
+    c.style.left = x + "px"; c.style.top = y + 12 + "px";
+    c.style.setProperty("--dx", (Math.cos(a) * d).toFixed(0) + "px"); c.style.setProperty("--dy", (Math.sin(a) * d).toFixed(0) + "px");
+    host.appendChild(c);
+    c.addEventListener("animationend", () => c.remove());
+  }
+  // the room joins in: the owl hops, Norbert wiggles, the train toots, the cat wakes up to look
+  const owl = document.querySelector(".deco.bookend"), brain = document.getElementById("brain-model"), train = document.querySelector('[data-click="train"]');
+  if (owl) replay(owl, "wiggle", 800);
+  if (brain) setTimeout(() => replay(brain, "wiggle", 800), 200);
+  if (train) setTimeout(() => replay(train, "chug", 1900), 350);
+  const cat = document.querySelector(".chair .cat");
+  if (cat && !catOnSill() && !room.classList.contains("storm")) replay(cat, "startled", 9100);
+  logSee("leaftop");
 }
 room.addEventListener("click", e => {
   const t = e.target;
@@ -2240,6 +2279,8 @@ function applyLook() {
   room.classList.toggle("storm", cond === "storm");  // the cat hides under the armchair
   room.classList.toggle("fireflies", t.m >= 6 && t.m <= 8 && (phase === "night" || phase === "dusk") && (cond === "clear" || cond === "cloudy"));
   if (cond === "storm" && !m) logSee("storm", 1, "day");
+  if (!m && t.m === 12 && t.d === 6) logSee("nikolaus", 1, "day");
+  if (!m && fireworksDay(t) && (phase === "night" || phase === "dusk")) logSee("fireworks", 1, "day");
   room.classList.toggle("winter", t.m === 12 || t.m <= 2);
   sky.fireworks = fireworksDay(t);
   sky.santa = t.m === 12 && t.d === 24;
@@ -2502,7 +2543,7 @@ async function loadWeather() {
     }
     else if (fly) { fly.back = clock + 8e3 + Math.random() * 8e3; catchFirefly(e.clientX, e.clientY); }
     else if (onVisitor(x, y)) visitor.flee = { t: clock, x: visitor.x, y: visitor.y, rise: visitor.rise };
-    else if (tram && x > tram.x && x < tram.x + 170 && y > tram.y - 30) tram.ding = clock;
+    else if (tram && x > tram.x && x < tram.x + 170 && y > tram.y - 30) { tram.ding = clock; logSee("streetcar"); }
     else if (onTower(x, y) && !ufo && !still) {
       const hx = W * 0.64;
       const b = buildings.find(b => hx >= b.x && hx <= b.x + b.w) || { h: 80 };
@@ -2963,6 +3004,7 @@ ffJar.addEventListener("click", e => {  // open the lid: they fly back out into 
 
 // ---- the visitors' log on the side table
 const LOG_ENTRIES = [
+  "Visitors",
   ["chickadee", "Black-capped chickadee", "all year, by day"],
   ["bluejay", "Blue jay", "all year, by day"],
   ["cardinal", "Northern cardinal", "November to March"],
@@ -2973,11 +3015,20 @@ const LOG_ENTRIES = [
   ["moth", "Moth", "summer nights"],
   ["raccoon", "Raccoon", "nights, spring to autumn"],
   ["ufo", "UFO", "raccoons beamed up from the CN Tower"],
-  ["firefly", "Fireflies", "caught on summer nights", "\u2728"],
   ["hubert", "Hubert", "visits by the vacuum robot", "\u{1F916}"],
+  ["santa", "Santa", "waved at on Christmas Eve", "\u{1F385}"],
+  "Moments",
+  ["leaftop", "Leaves blown to the top", "keep one in the air, all the way up", "\u{1F341}"],
   ["ride", "Cat rides Hubert", "she has to want to", "\u{1F408}"],
+  ["firefly", "Fireflies", "caught on summer nights", "\u2728"],
+  ["eggs", "Egg hunts", "all the eggs found on Easter Sunday", "\u{1F95A}"],
+  ["nikolaus", "Nikolaus came", "boots filled on December 6", "\u{1F462}"],
+  ["fireworks", "Fireworks", "nights with fireworks over the city", "\u{1F386}"],
   ["storm", "Thunderstorms", "days with a storm over Toronto", "\u26C8\uFE0F"],
-  ["santa", "Santa", "waved at on Christmas Eve", "\u{1F385}"]
+  ["flower", "Flowers", "grown in the plant on the bookcase", "\u{1F33C}"],
+  ["hearts", "Heart fireworks", "sent from the photo", "\u{1F496}"],
+  ["streetcar", "Streetcar bells", "rung on the street below", "\u{1F514}"],
+  ["secret", "Norbert's secret", "found the backstage controls", "\u{1F9E0}"]
 ];
 const logDlg = document.getElementById("logdlg");
 document.getElementById("logbook").addEventListener("click", e => {
@@ -2985,7 +3036,13 @@ document.getElementById("logbook").addEventListener("click", e => {
   const fmt = ms => new Date(ms).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
   const list = document.getElementById("log-list");
   list.innerHTML = "";
-  LOG_ENTRIES.forEach(([key, name, hint, emoji]) => {
+  LOG_ENTRIES.forEach(entry => {
+    if (typeof entry === "string") {  // a section heading
+      const h = document.createElement("li");
+      h.className = "log-section"; h.textContent = entry;
+      return list.appendChild(h);
+    }
+    const [key, name, hint, emoji] = entry;
     const seen = roomLog[key], li = document.createElement("li");
     li.className = seen ? "seen" : "unseen";
     const pic = emoji ? `<span class="emoji" aria-hidden="true">${emoji}</span>` : `<img alt="" src="${window.visitorIcon ? window.visitorIcon(key) : ""}">`;

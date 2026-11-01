@@ -80,7 +80,7 @@
   });
 
   // secret switch: type "brain", or tap the model brain three times. Not remembered: a reload starts hidden.
-  function show(on) { pv.hidden = !on; }
+  function show(on) { pv.hidden = !on; if (on && typeof logSee === "function") logSee("secret", 1, "day"); }
   let typed = "";
   document.addEventListener("keydown", e => {
     if (e.target.closest && e.target.closest("input, select, textarea")) return;
