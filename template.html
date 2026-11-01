@@ -505,7 +505,7 @@ svg .part { transform-box: fill-box; }
 .glasses .temple { bottom: 13px; width: 26px; height: 3px; background: #3d2719; border-radius: 2px; }
 .glasses .temple.l { left: 8px; transform: rotate(-16deg); transform-origin: left center; }
 .glasses .temple.r { right: 8px; transform: rotate(16deg); transform-origin: right center; }
-.typewriter { position: absolute; left: 42px; top: 12px; display: block; outline: none; }
+.typewriter { position: absolute; left: 60px; top: 12px; display: block; outline: none; }
 .typewriter svg { display: block; overflow: visible; filter: drop-shadow(1px 3px 3px rgba(0,0,0,.45)); }
 .typewriter:focus-visible { box-shadow: 0 0 0 2px var(--lamp); border-radius: 4px; }
 .tw-ding { opacity: 0; }
@@ -580,18 +580,18 @@ svg .part { transform-box: fill-box; }
 .watch-cat.pounce { animation: cat-pounce .42s ease-in forwards; }
 @keyframes cat-pounce { 30% { translate: 0 -18px; } 100% { translate: 0 90px; opacity: 0; scale: .8; } }
 /* thunderstorm: the room lights up with each flash; the cat hides under the armchair */
-.flash { position: fixed; inset: 0; z-index: 15; pointer-events: none; opacity: 0; background: #e4ebff; mix-blend-mode: soft-light; }
+.flash { position: fixed; inset: 0; z-index: 15; pointer-events: none; opacity: 0; background: #c9d6ff; mix-blend-mode: screen; }
 .flash.flashing { animation: flash .9s linear; }
-@keyframes flash { 0% { opacity: .9; } 10% { opacity: .15; } 19% { opacity: .2; } 33% { opacity: .75; } 100% { opacity: 0; } }
-.hide-cat { display: none; position: absolute; left: 50px; bottom: -4px; z-index: 1; pointer-events: none; }
+@keyframes flash { 0% { opacity: .45; } 10% { opacity: .08; } 19% { opacity: .1; } 33% { opacity: .38; } 100% { opacity: 0; } }
+.hide-cat { display: none; position: absolute; left: 58px; bottom: -2px; pointer-events: none; }  /* before the skirt in the markup: it covers her back */
 .hide-cat svg { display: block; overflow: visible; }
 .room.storm .chair .cat:not(.hop) { display: none; }
 .room.storm:not(.hubert) .hide-cat { display: block; }
 .hide-cat .hc-eyes { animation: hc-blink 5s infinite; transform-box: fill-box; transform-origin: 50% 50%; }
 @keyframes hc-blink { 0%, 92%, 100% { scale: 1 1; } 95% { scale: 1 .1; } }
 .hide-cat .hc-pupil { transform-box: fill-box; transform-origin: 50% 50%; transition: scale .15s; }
-.room.flash .hide-cat .hc-pupil { scale: 3.2 1; }
-.hide-cat .hc-tail { transform-box: fill-box; transform-origin: 0 50%; animation: tail-nervous 1.6s ease-in-out infinite; }
+.room.lightning .hide-cat .hc-pupil { scale: .3 1; }  /* wide-eyed; the flash narrows her pupils to slits */
+.hide-cat .hc-tail { transform-box: fill-box; transform-origin: 0 100%; animation: tail-nervous 1.6s ease-in-out infinite; }
 /* fireflies: a jar on the sill on summer nights */
 .firefly-jar { display: none; position: absolute; left: 20%; bottom: 0; z-index: 3; padding: 0; border: 0; background: none; cursor: pointer; line-height: 0;
   filter: drop-shadow(0 0 calc(var(--n) * 2px) rgba(214, 255, 120, calc(var(--n) * .08))); }
@@ -844,13 +844,23 @@ svg .part { transform-box: fill-box; }
           <div class="arm l" aria-hidden="true"></div>
           <div class="arm r" aria-hidden="true"></div>
           <div class="throw" aria-hidden="true"></div>
+          <div class="hide-cat" aria-hidden="true"><svg width="100" height="30" viewBox="0 0 100 30">
+            <ellipse cx="52" cy="28.5" rx="40" ry="2.6" fill="rgba(0,0,0,.4)"/>
+            <g class="hc-tail"><path d="M76 24 Q92 26 93 17 Q94 10 88 9" stroke="#8f5224" stroke-width="7" stroke-linecap="round" fill="none"/>
+              <path d="M76 24 Q92 26 93 17 Q94 10 88 9" stroke="#a8652e" stroke-width="2" stroke-dasharray="1.5 3" fill="none"/></g>
+            <path d="M22 28 Q20 14 38 12 H66 Q82 12 82 22 Q82 28 76 28 Z" fill="#9a5a28"/>
+            <path d="M44 15 q2 6 0 12 M54 14 q2 7 0 13 M64 14 q2 7 0 13" stroke="#7e461c" stroke-width="2" fill="none"/>
+            <ellipse cx="23" cy="27.5" rx="4.5" ry="2.4" fill="#b8723a"/><ellipse cx="33" cy="27.8" rx="4.5" ry="2.4" fill="#b8723a"/>
+            <path d="M14 13 L8 10 L13 17 Z M38 13 L44 10 L39 17 Z" fill="#9a5a28"/>
+            <ellipse cx="26" cy="19" rx="12" ry="9" fill="#a8652e"/>
+            <ellipse cx="26" cy="23.5" rx="5" ry="3" fill="#c88a52"/>
+            <g class="hc-eyes"><circle cx="21" cy="17.5" r="3.3" fill="#e2e868"/><circle cx="31" cy="17.5" r="3.3" fill="#e2e868"/>
+              <ellipse class="hc-pupil" cx="21" cy="17.6" rx="2.4" ry="2.6" fill="#140e0a"/><ellipse class="hc-pupil" cx="31" cy="17.6" rx="2.4" ry="2.6" fill="#140e0a"/>
+              <circle cx="20" cy="16.4" r=".8" fill="#fff"/><circle cx="30" cy="16.4" r=".8" fill="#fff"/></g>
+            <path d="M24.6 21.2 L27.4 21.2 L26 22.6 Z" fill="#e8a8a0"/>
+            <path d="M18 22 L9 21 M18 23.6 L9 24.6 M34 22 L43 21 M34 23.6 L43 24.6" stroke="#f2e2c8" stroke-width=".5"/></svg></div>
           <div class="skirt" aria-hidden="true"></div>
           <div class="leg l" aria-hidden="true"></div><div class="leg r" aria-hidden="true"></div>
-          <div class="hide-cat" aria-hidden="true"><svg width="120" height="26" viewBox="0 0 120 26">
-            <ellipse cx="54" cy="20" rx="44" ry="7" fill="rgba(0,0,0,.55)"/>
-            <path class="hc-tail" d="M86 22 Q100 24 104 16 Q107 10 112 12" stroke="#b96d2f" stroke-width="5" stroke-linecap="round" fill="none"/>
-            <g class="hc-eyes"><ellipse cx="44" cy="14" rx="3.4" ry="2.4" fill="#d8e05a"/><ellipse cx="56" cy="14" rx="3.4" ry="2.4" fill="#d8e05a"/>
-              <ellipse class="hc-pupil" cx="44" cy="14" rx=".9" ry="2.2" fill="#1a1410"/><ellipse class="hc-pupil" cx="56" cy="14" rx=".9" ry="2.2" fill="#1a1410"/></g></svg></div>
           <div class="mug" aria-hidden="true"><span class="steam a"></span><span class="steam b"></span></div>
         </div>
         <section class="table-wrap" aria-labelledby="reading-label">
@@ -1956,7 +1966,7 @@ const nest = () => `<svg width="40" height="24" viewBox="0 0 40 24">
 const HIDING = [  // where things are tucked away: an element of the room, and a spot relative to it
   [".lamp", "left: 50px; bottom: 0", () => egg("#e0607a", "#fbe3ea")],
   [".chair", "left: 98px; bottom: 0", () => egg("#f2c12e", "#e0483e")],
-  [".side-table", "right: 14px; top: 52px", () => egg("#5fb0e8", "#fff")],
+  [".side-table", "right: 2px; top: 52px", () => egg("#5fb0e8", "#fff")],
   [".box", "left: -34px; bottom: 0", nest],
   [".piles", "left: calc(50% - 7px); bottom: 0", () => egg("#7a5ac8", "#f2c12e")],
   [".door-wrap", "right: 10px; top: -40px", bunny],
@@ -2707,7 +2717,7 @@ async function loadWeather() {
       for (let y = 0, x = x0; y < H - 120; y += 18 + Math.random() * 16) { pts.push([x, y]); x += (Math.random() - 0.5) * 34; }
       bolt = { t, pts, strike: Math.random() < 0.6 };
       replay(flashEl, "flashing", 900);
-      room.classList.add("flash"); setTimeout(() => room.classList.remove("flash"), 900);
+      room.classList.add("lightning"); setTimeout(() => room.classList.remove("lightning"), 900);  // not "flash": that is the overlay's class
     }
     if (!bolt) return;
     const e = t - bolt.t;
@@ -2987,6 +2997,8 @@ document.getElementById("logbook").addEventListener("click", e => {
   logDlg.showModal();
 });
 document.getElementById("log-close").addEventListener("click", () => logDlg.close());
+["mouseenter", "focus"].forEach(ev => document.getElementById("logbook").addEventListener(ev, e => showNote(e.currentTarget, "Visitors' log")));
+["mouseleave", "blur"].forEach(ev => document.getElementById("logbook").addEventListener(ev, hideTip));
 logDlg.addEventListener("click", e => { if (e.target === logDlg) logDlg.close(); });
 
 // Hubert, the vacuum robot: now and then he drives in from the right, wanders the floor in gentle curves,
