@@ -559,11 +559,8 @@ svg .part { transform-box: fill-box; }
 @keyframes mug-teeter { 15% { rotate: -14deg; } 35% { rotate: 8deg; } 55% { rotate: -6deg; } 75% { rotate: 3deg; } 100% { rotate: 0deg; } }
 .aside { position: absolute; left: 70%; top: -10px; z-index: 6; pointer-events: none; font-family: var(--font-hand); font-weight: 700; font-size: 19px; line-height: 1; color: #efe2c8; white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.5); animation: heart-float 2s ease-out forwards; }
 /* the clock's time-lapse: the hands race round while the window goes through a day */
-.clock #clock-h, .clock #clock-m { transform-origin: 29px 32px; }
-.clock.lapse #clock-h { animation: hand 4.6s linear infinite; }
-.clock.lapse #clock-m { animation: hand .383s linear infinite; }
+.clock #clock-h, .clock #clock-m, .clock #clock-s { transform-origin: 29px 32px; }
 .clock.lapse #clock-s { visibility: hidden; }
-@keyframes hand { to { rotate: 360deg; } }
 /* disco: three clicks on the lamp */
 .disco-ball { position: absolute; left: 52%; top: 0; z-index: 12; width: 60px; margin-left: -30px; pointer-events: none; animation: disco-drop 7s ease-in-out forwards; }
 .disco-ball::before { content: ""; position: absolute; left: 29px; bottom: 58px; width: 2px; height: 600px; background: #8a8f96; }
@@ -1668,6 +1665,17 @@ function moonAge(when) {
   const NEW_MOON = Date.UTC(2000, 0, 6, 18, 14), MONTH = 29.530588853 * 864e5;
   return (((when - NEW_MOON) % MONTH) + MONTH) % MONTH / MONTH;
 }
+// the room's "now": real time, or during the clock's time-lapse a day wound through in a few seconds
+function skyClock() {
+  const l = sky.lapse;
+  return l ? l.from + Math.min(1, (performance.now() - l.start) / l.dur) * 864e5 : Date.now();
+}
+function sunAround(now) {  // today's sunrise and sunset, moved a day either way to the ones nearest now
+  let rise = sky.rise, set = sky.set;
+  while (now > set + 12 * 36e5) { rise += 864e5; set += 864e5; }
+  while (now < rise - 12 * 36e5) { rise -= 864e5; set -= 864e5; }
+  return [rise, set];
+}
 function phaseAt(now, rise, set) {
   const w = 45 * 60e3;
   if (Math.abs(now - rise) <= w) return "dawn";
@@ -2239,12 +2247,11 @@ function nudgeMug(mug) {  // three quick clicks: the cat reaches over and pushes
 }
 function timeLapse() {  // three quick clicks on the clock: a whole day in the window in about ten seconds
   if (sky.lapse || reduceMotion || !sky.shown) return;
-  const order = ["dawn", "day", "dusk", "night"], at = order.indexOf(sky.shown.phase);
-  const steps = [1, 2, 3, 4].map(k => order[(at + k) % 4]), STEP = 2300;  // round to where it started
   logSee("timelapse");
+  sky.lapse = { start: performance.now(), from: Date.now(), dur: 9600 };
   clockEl.classList.add("lapse");
-  steps.forEach((ph, k) => setTimeout(() => { sky.lapse = ph; applyLook(); }, k * STEP));
-  setTimeout(() => { sky.lapse = null; clockEl.classList.remove("lapse"); tickClock(); applyLook(); }, steps.length * STEP);
+  const look = setInterval(applyLook, 120);  // the time of day changes as the hours fly
+  setTimeout(() => { clearInterval(look); sky.lapse = null; clockEl.classList.remove("lapse"); tickClock(); applyLook(); }, sky.lapse.dur);
 }
 function disco() {  // three quick clicks on the lamp: a disco ball comes down and everything dances for a few seconds
   if (reduceMotion || document.querySelector(".disco-ball")) return;
@@ -2389,15 +2396,15 @@ room.addEventListener("click", e => {
 });
 
 // the wall clock keeps Toronto time
-function torontoTime() {
+function torontoTime(when = Date.now()) {
   const p = {};
   new Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto", hour: "numeric", minute: "numeric", second: "numeric", hourCycle: "h23" })
-    .formatToParts(Date.now()).forEach(x => { p[x.type] = +x.value; });
+    .formatToParts(when).forEach(x => { p[x.type] = +x.value; });
   return p;
 }
 function tickClock() {
-  const p = torontoTime();
-  const turn = (id, deg) => { const hand = document.getElementById(id); if (hand) hand.setAttribute("transform", `rotate(${deg.toFixed(1)} 29 32)`); };
+  const p = torontoTime(skyClock());
+  const turn = (id, deg) => { const hand = document.getElementById(id); if (hand) hand.style.rotate = deg.toFixed(1) + "deg"; };
   turn("clock-h", (p.hour % 12 + p.minute / 60) * 30);
   turn("clock-m", (p.minute + p.second / 60) * 6);
   turn("clock-s", p.second * 6);
@@ -2416,13 +2423,14 @@ function applyLook() {
   const m = h && (h[1] || h[3]) ? h : null;
   const now = Date.now();
   if (!sky.rise || Math.abs(now - sky.rise) > 20 * 36e5) Object.assign(sky, sunTimes(now));
-  let phase = phaseAt(now, sky.rise, sky.set), cond = sky.cond, clouds = sky.clouds;
+  const skyNow = skyClock();
+  let phase = phaseAt(skyNow, ...sunAround(skyNow)), cond = sky.cond, clouds = sky.clouds;
   if (m && m[1]) {
     phase = m[1];
     if (m[2]) [cond, clouds] = m[2] === "clear" ? ["clear", 1] : condFrom(m[2] === "storm" ? "thunderstorm" : m[2]);
   }
-  if (sky.lapse) phase = sky.lapse;  // the clock's time-lapse
-  sky.shown = { phase, cond, clouds };
+  if (sky.lapse) phase = phaseAt(skyNow, ...sunAround(skyNow));  // the clock's time-lapse wins over a previewed time
+  sky.shown = { phase, cond, clouds, real: !(m && m[1]) || !!sky.lapse };  // real: the sun and moon follow the clock
   room.classList.toggle("daylight", phase === "day");
   const note = document.getElementById("wx");
   const today = torontoToday(now);
@@ -2972,8 +2980,23 @@ async function loadWeather() {
     ctx.globalAlpha = 1;
   }
   const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let cloudT = 0, lastT = 0;
+  // the sun's and the moon's places: on an arc across the window, by the clock; fixed spots for a previewed time of day
+  function sunAt(phase) {
+    if (!sky.shown || !sky.shown.real) return { dawn: [0.18, 0.62], day: [0.74, 0.2], dusk: [0.84, 0.6] }[phase];
+    const now = skyClock(), [rise, set] = sunAround(now), u = (now - rise) / (set - rise);
+    return [0.08 + 0.84 * u, 0.7 - 0.56 * Math.sin(Math.PI * Math.max(0, Math.min(1, u)))];
+  }
+  function moonAt() {
+    if (!sky.shown || !sky.shown.real) return [0.78, 0.2];
+    const now = skyClock(), [rise, set] = sunAround(now);
+    const from = now >= set ? set : set - 864e5, to = now >= set ? rise + 864e5 : rise, v = (now - from) / (to - from);
+    return [0.08 + 0.84 * v, 0.62 - 0.46 * Math.sin(Math.PI * Math.max(0, Math.min(1, v)))];
+  }
   function draw(t) {
     const { phase, cond, clouds } = sky.shown || { phase: "night", cond: "clear", clouds: 0 };
+    cloudT += (t - (lastT || t)) * (sky.lapse ? 45 : 1); lastT = t;  // the clouds race by during the time-lapse
+    if (sky.lapse) tickClock();
     const grey = GREYNESS[cond];
     const g = ctx.createLinearGradient(0, 0, 0, H);
     SKIES[phase].forEach((c, i) => g.addColorStop([0, 0.65, 1][i], mix(c, GREY[phase], grey)));
@@ -2991,7 +3014,7 @@ async function loadWeather() {
     // sun or moon
     if (phase === "night") {
       // the moon as Toronto sees it: lit on the right while waxing, on the left while waning
-      const mx = W * 0.78, my = H * 0.2, r = 30, age = sky.shown ? sky.shown.moon : 0.5;
+      const [mxf, myf] = moonAt(), mx = W * mxf, my = H * myf, r = 30, age = sky.shown ? sky.shown.moon : 0.5;
       const k = Math.cos(2 * Math.PI * age);  // 1 at new moon, -1 at full
       ctx.save();
       ctx.translate(mx, my);
@@ -3008,7 +3031,7 @@ async function loadWeather() {
       ctx.fill();
       ctx.restore();
     } else {
-      const pos = { dawn: [0.18, 0.62], day: [0.74, 0.2], dusk: [0.84, 0.6] }[phase];
+      const pos = sunAt(phase);
       const sx = W * pos[0], sy = H * pos[1];
       const glow = ctx.createRadialGradient(sx, sy, 4, sx, sy, veiled ? 140 : 90);
       glow.addColorStop(0, phase === "day" ? "rgba(255,250,225,.9)" : "rgba(255,214,150,.85)");
@@ -3023,7 +3046,7 @@ async function loadWeather() {
     }
     // clouds behind the city
     cloudSeeds.slice(0, clouds).forEach(c => {
-      const x = still ? c.x : (c.x + t * c.v * 0.05) % (W + 260) - 130;
+      const x = still ? c.x : (c.x + cloudT * c.v * 0.05) % (W + 260) - 130;
       cloud(x, c.y, c.s, mix(CLOUD[phase], GREY[phase], grey * 0.5), cond === "clear" ? 0.75 : 0.9);
     });
     drawFireworks(t, phase, cond);
