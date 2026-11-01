@@ -21,7 +21,8 @@
       <option value="feb10">Feb 10 · Black History Month</option>
       <option value="feb17">Feb 17 · Lunar New Year</option>
       <option value="mar15">Mar 15 · Maple syrup</option>
-      <option value="apr3">Apr 3 · Easter</option>
+      <option value="apr3">Apr 3 · Easter tree</option>
+      <option id="pv-easter">Easter Sunday · egg hunt</option>
       <option value="may15">May 15 · Tulips</option>
       <option value="may18">May 18 · Victoria Day (fireworks at night)</option>
       <option value="jun15">Jun 15 · Pride Month</option>
@@ -41,7 +42,7 @@
       <option value="dec7">Dec 7 · Hanukkah, fourth night</option>
       <option value="dec12">Dec 12 · Christmas tree</option>
       <option value="dec22">Dec 22 · Advent, four candles</option>
-      <option value="dec24">Dec 24 · Christmas Eve</option>
+      <option value="dec24">Dec 24 · Christmas Eve, Santa flies by</option>
       <option value="dec31">Dec 31 · New Year's Eve (fireworks at night)</option>
     </select>
   </label>
@@ -63,6 +64,10 @@
   const pv = document.getElementById("pv");
   const [date, phase, wx] = ["pv-date", "pv-phase", "pv-wx"].map(id => document.getElementById(id));
   pv.addEventListener("submit", e => e.preventDefault());
+  // Easter moves: this year's Sunday
+  const eDay = new Date(easter(new Date().getFullYear()) * 864e5), eOpt = document.getElementById("pv-easter");
+  eOpt.value = MONTHS[eDay.getUTCMonth()] + eDay.getUTCDate();
+  eOpt.textContent = eDay.toLocaleDateString("en-CA", { month: "short", day: "numeric", timeZone: "UTC" }) + " · Easter Sunday, egg hunt";
   document.getElementById("pv-visit").addEventListener("click", () => window.sendVisitor && window.sendVisitor());
   document.getElementById("pv-tram").addEventListener("click", () => window.sendStreetcar && window.sendStreetcar());
   document.getElementById("pv-hubert").addEventListener("click", () => window.sendHubert && window.sendHubert());
