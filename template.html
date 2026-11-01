@@ -171,7 +171,7 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
       #24150a 0, #301d0f calc(var(--row) - 1px),
       #8a5a34 calc(var(--row) - 1px), var(--wood) calc(var(--row) + 4px), #5e3b20 calc(var(--row) + var(--plank)));
 }
-.slot { height: var(--row); display: flex; align-items: flex-end; }
+.slot { height: var(--row); display: flex; align-items: flex-end; flex: none; }  /* width set in addSpine: iPad WebKit sizes it from the sideways text otherwise */
 .book {
   --c: #7b2d26;
   --fg: #f4e8d6;
@@ -982,10 +982,12 @@ function thickness(b, r, thin = 1) {
 function addSpine(container, b, shelf, minH, spanH, thin = 1) {
   const el = makeBook(b, shelf, "spine");
   const r = el._rand;
-  el.style.setProperty("--w", thickness(b, r, thin) + "px");
+  const w = thickness(b, r, thin);
+  el.style.setProperty("--w", w + "px");
   el.style.setProperty("--h", Math.round(minH + r() * spanH) + "px");
   const slot = document.createElement("div");
   slot.className = "slot";
+  slot.style.width = w + 1 + "px";  // the spine and its 1px margin
   slot.appendChild(el);
   container.appendChild(slot);
   return el;
@@ -1067,7 +1069,7 @@ function layoutBookcase() {
   shelves.innerHTML = "";
   bookSlots.forEach(slot => {
     const sp = slot.firstElementChild;
-    sp.classList.remove("leaning"); sp.style.removeProperty("--lean"); sp.style.marginLeft = "";
+    sp.classList.remove("leaning"); sp.style.removeProperty("--lean"); slot.style.marginLeft = "";
   });
   rows.forEach(row => {
     const div = document.createElement("div");
@@ -1092,7 +1094,7 @@ function layoutBookcase() {
       while (deg > 3 && pushFor(deg) > free - 6) deg -= 0.5;
       sp.classList.add("leaning");
       sp.style.setProperty("--lean", -deg.toFixed(1) + "deg");
-      sp.style.marginLeft = (pushFor(deg) - 1).toFixed(1) + "px";  // the neighbour's 1px margin
+      lastSlot.style.marginLeft = (pushFor(deg) - 1).toFixed(1) + "px";  // the neighbour's 1px margin
     }
     items.forEach(x => div.appendChild(x));
     if (jarOnShelf && row === rows[0]) div.appendChild(jar);
