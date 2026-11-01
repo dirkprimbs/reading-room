@@ -574,8 +574,52 @@ svg .part { transform-box: fill-box; }
 .chair .cat.hop { animation: cat-hop .35s ease-in forwards; }
 @keyframes cat-hop { 100% { translate: -10px -46px; opacity: 0; } }
 .room.hubert .chair .cat:not(.hop), .room.hubert .sill-cat { display: none; }
-.room.hubert .watch-cat { display: block; }
-.hubert-canvas { position: absolute; left: 0; top: -30px; width: 100%; height: 100px; z-index: 2; pointer-events: none; }
+.room.hubert .watch-cat { display: block; pointer-events: auto; cursor: pointer; }
+.room.riding .watch-cat { display: none; }
+.room.hubert .floor { cursor: pointer; }  /* a click drops a crumb for him */
+.watch-cat.pounce { animation: cat-pounce .42s ease-in forwards; }
+@keyframes cat-pounce { 30% { translate: 0 -18px; } 100% { translate: 0 90px; opacity: 0; scale: .8; } }
+/* thunderstorm: the room lights up with each flash; the cat hides under the armchair */
+.flash { position: fixed; inset: 0; z-index: 15; pointer-events: none; opacity: 0; background: #e4ebff; mix-blend-mode: soft-light; }
+.flash.flashing { animation: flash .9s linear; }
+@keyframes flash { 0% { opacity: .9; } 10% { opacity: .15; } 19% { opacity: .2; } 33% { opacity: .75; } 100% { opacity: 0; } }
+.hide-cat { display: none; position: absolute; left: 50px; bottom: -4px; z-index: 1; pointer-events: none; }
+.hide-cat svg { display: block; overflow: visible; }
+.room.storm .chair .cat:not(.hop) { display: none; }
+.room.storm:not(.hubert) .hide-cat { display: block; }
+.hide-cat .hc-eyes { animation: hc-blink 5s infinite; transform-box: fill-box; transform-origin: 50% 50%; }
+@keyframes hc-blink { 0%, 92%, 100% { scale: 1 1; } 95% { scale: 1 .1; } }
+.hide-cat .hc-pupil { transform-box: fill-box; transform-origin: 50% 50%; transition: scale .15s; }
+.room.flash .hide-cat .hc-pupil { scale: 3.2 1; }
+.hide-cat .hc-tail { transform-box: fill-box; transform-origin: 0 50%; animation: tail-nervous 1.6s ease-in-out infinite; }
+/* fireflies: a jar on the sill on summer nights */
+.firefly-jar { display: none; position: absolute; left: 20%; bottom: 0; z-index: 3; padding: 0; border: 0; background: none; cursor: pointer; line-height: 0;
+  filter: drop-shadow(0 0 calc(var(--n) * 2px) rgba(214, 255, 120, calc(var(--n) * .08))); }
+.room.fireflies .firefly-jar { display: block; }
+.firefly-jar svg { overflow: visible; }
+.firefly-jar .ff-dot { animation: ff-blink 2.4s ease-in-out infinite; }
+@keyframes ff-blink { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+.ff-fly { position: absolute; z-index: 6; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; pointer-events: none;
+  background: #e2ff8a; box-shadow: 0 0 8px 3px rgba(214, 255, 120, .7); transition: left .9s cubic-bezier(.4,0,.6,1), top .9s cubic-bezier(.5,-.4,.6,1); }
+.ff-fly.free { transition: left 2.4s ease-out, top 2.4s ease-out, opacity 2.4s ease-in; opacity: 0; }
+/* the visitors' log */
+.logbook { position: absolute; left: 6px; top: 53px; padding: 0; border: 0; background: none; cursor: pointer; line-height: 0; }
+.logbook:hover svg, .logbook:focus-visible svg { translate: 0 -2px; }
+.logbook:focus-visible { outline: 2px solid var(--lamp); outline-offset: 2px; }
+.card.logdlg[open] { display: block; width: min(600px, calc(100vw - 32px)); }
+.logdlg h2 { margin: 0; font-size: 34px; color: #4a2d18; }
+.log-sub { margin: 2px 0 14px; font-size: 14px; color: #7a6450; }
+.log-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+.log-list li { display: grid; grid-template-columns: 46px 1fr; gap: 8px; align-items: center; min-height: 46px; }
+.log-list img { width: 46px; height: 46px; object-fit: contain; }
+.log-list li.unseen img { filter: brightness(0) opacity(.28); }
+.log-list b { display: block; font-size: 15px; }
+.log-list small { display: block; font-size: 13px; color: #7a6450; line-height: 1.25; }
+.log-list li.unseen b { color: #8a7a68; }
+.log-list .emoji { font-size: 30px; text-align: center; line-height: 46px; }
+.log-list li.unseen .emoji { filter: grayscale(1) opacity(.35); }
+@media (max-width: 520px) { .log-list { grid-template-columns: 1fr; } }
+.hubert-canvas { position: absolute; left: 0; top: -80px; width: 100%; height: 150px; z-index: 2; pointer-events: none; }
 .hubert-hit { position: absolute; z-index: 3; width: 70px; height: 44px; margin: -30px 0 0 -35px; display: none; pointer-events: auto; cursor: pointer; }
 /* the sort switch, written next to the bookcase */
 .sort-switch { padding: 0; background: none; border: 0; cursor: pointer; text-decoration: underline dotted rgba(187, 166, 139, .6); text-underline-offset: 5px; }
@@ -763,6 +807,10 @@ svg .part { transform-box: fill-box; }
         <div class="curtain r"></div>
         <div class="sill"></div>
         <div class="deco-layer" id="deco"></div>
+        <button class="firefly-jar" id="ff-jar" type="button" aria-label="Firefly jar: let them go" style="--n: 0"><svg width="30" height="40" viewBox="0 0 30 40" aria-hidden="true">
+          <rect x="6" y="1" width="18" height="5" rx="1" fill="#9a9ea4"/><rect x="5" y="5" width="20" height="3" rx="1" fill="#7c8086"/>
+          <path d="M6 8 Q2 12 2 18 V34 Q2 39 8 39 H22 Q28 39 28 34 V18 Q28 12 24 8 Z" fill="rgba(200,225,235,.18)" stroke="rgba(225,240,245,.55)" stroke-width="1.2"/>
+          <path d="M6 15 V32" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/><g class="ff-in"></g></svg></button>
         <div class="sill-cat"><svg width="44" height="56" viewBox="0 0 44 56">
           <path class="sc-tail" d="M30 54 Q44 52 42 40 Q41 34 37 36 Q39 46 28 50 Z" fill="#b96d2f"/>
           <path d="M6 56 Q2 40 10 30 Q14 24 22 24 Q30 24 34 30 Q42 40 38 56 Z" fill="#c87a3a"/>
@@ -798,12 +846,20 @@ svg .part { transform-box: fill-box; }
           <div class="throw" aria-hidden="true"></div>
           <div class="skirt" aria-hidden="true"></div>
           <div class="leg l" aria-hidden="true"></div><div class="leg r" aria-hidden="true"></div>
+          <div class="hide-cat" aria-hidden="true"><svg width="120" height="26" viewBox="0 0 120 26">
+            <ellipse cx="54" cy="20" rx="44" ry="7" fill="rgba(0,0,0,.55)"/>
+            <path class="hc-tail" d="M86 22 Q100 24 104 16 Q107 10 112 12" stroke="#b96d2f" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <g class="hc-eyes"><ellipse cx="44" cy="14" rx="3.4" ry="2.4" fill="#d8e05a"/><ellipse cx="56" cy="14" rx="3.4" ry="2.4" fill="#d8e05a"/>
+              <ellipse class="hc-pupil" cx="44" cy="14" rx=".9" ry="2.2" fill="#1a1410"/><ellipse class="hc-pupil" cx="56" cy="14" rx=".9" ry="2.2" fill="#1a1410"/></g></svg></div>
           <div class="mug" aria-hidden="true"><span class="steam a"></span><span class="steam b"></span></div>
         </div>
         <section class="table-wrap" aria-labelledby="reading-label">
           <div class="hand" id="reading-label"><a class="shelf-link" href="https://bookwyrm.social/user/drkprmbs/books/reading" title="Currently reading, on BookWyrm">Reading now</a></div>
           <div class="stack" id="stack"><div class="glasses" aria-hidden="true"><i class="temple l"></i><i class="temple r"></i><i class="lens l"></i><i class="bridge"></i><i class="lens r"></i></div></div>
           <div class="side-table grounded"><div class="top" aria-hidden="true"></div><div class="leg l" aria-hidden="true"></div><div class="leg r" aria-hidden="true"></div><div class="shelf" aria-hidden="true"></div>
+            <button class="logbook" id="logbook" type="button" aria-label="The visitors' log"><svg width="46" height="13" viewBox="0 0 46 13" aria-hidden="true">
+              <rect x="1" y="3" width="44" height="9" rx="1.5" fill="#efe6d2"/><rect x="1" y="1" width="44" height="9" rx="1.5" fill="#2f5a46"/>
+              <path d="M8 1 V10" stroke="#24463a" stroke-width="1.4"/><rect x="34" y="0" width="3" height="13" fill="#c8202a"/></svg></button>
             <a class="typewriter site-link" href="https://unprompted.dirkprimbs.de/" data-note="Unprompted, Dirk's blog" aria-label="Unprompted, Dirk's blog">
               <svg width="84" height="56" viewBox="0 0 84 56" aria-hidden="true">
                 <g class="tw-paper"><rect x="24" y="0" width="36" height="24" fill="#f4efe6"/>
@@ -857,9 +913,15 @@ svg .part { transform-box: fill-box; }
     </a>
     </div>
   </div>
+  <div class="flash" id="flash" aria-hidden="true"></div>
   <div class="floor" aria-hidden="true"><div class="rug"></div><canvas class="hubert-canvas" id="hubert"></canvas><div class="hubert-hit" id="hubert-hit"></div><div class="floor-deco" id="floor-deco"></div></div>
   </div></div>
   <footer class="credits">Shelves from <a href="https://bookwyrm.social/user/drkprmbs">bookwyrm.social/user/drkprmbs</a>, <span id="built"></span>.<span id="wx-credit"></span> Code on <a href="https://github.com/dirkprimbs/reading-room">GitHub</a>.</footer>
+  <dialog class="card logdlg" id="logdlg" aria-labelledby="log-title">
+    <button class="card-close" id="log-close" type="button" aria-label="Close">&times;</button>
+    <div><h2 class="hand" id="log-title">Visitors' log</h2><p class="log-sub">Who has come by while the room was open in this browser.</p>
+    <ul class="log-list" id="log-list"></ul></div>
+  </dialog>
   <dialog class="card" id="card" aria-labelledby="card-title">
     <button class="card-close" id="card-close" type="button" aria-label="Close">&times;</button>
     <div class="card-art">
@@ -1506,6 +1568,17 @@ const TORONTO = { lat: 43.65, lon: -79.38 };
 const WEATHER_URL = __WEATHER_URL__;  // Environment Canada city page for Toronto, or null
 const sky = { phase: "night", cond: "clear", clouds: 0, label: "", rise: 0, set: 0 };
 
+// ---- the visitors' log: who has come by while this browser had the room open, kept in localStorage
+const LOG_KEY = "reading-room-log";
+const roomLog = (() => { try { return JSON.parse(localStorage.getItem(LOG_KEY)) || {}; } catch (e) { return {}; } })();
+function logSee(key, n = 1, once) {  // once: "day" counts a key at most once a day (a storm, say)
+  const e = roomLog[key] || (roomLog[key] = { n: 0, first: Date.now() });
+  const today = new Date().toDateString();
+  if (once === "day" && e.day === today) return;
+  e.n += n; e.last = Date.now(); e.day = today;
+  try { localStorage.setItem(LOG_KEY, JSON.stringify(roomLog)); } catch (err) { /* private mode: remembered until reload */ }
+}
+
 // sunrise and sunset in ms (NOAA approximation, good to a few minutes)
 function sunTimes(now) {
   const rad = Math.PI / 180;
@@ -1534,9 +1607,10 @@ function phaseAt(now, rise, set) {
   if (Math.abs(now - set) <= w) return "dusk";
   return now > rise && now < set ? "day" : "night";
 }
-// Environment Canada condition text -> one of five looks
+// Environment Canada condition text -> one of six looks
 function condFrom(text) {
   const t = (text || "").toLowerCase();
+  if (/thunder|lightning/.test(t)) return ["storm", 7];
   if (/snow|flurr|ice|blizzard|hail/.test(t)) return ["snow", 5];
   if (/rain|drizzle|shower|thunder/.test(t)) return ["rain", 6];
   if (/fog|mist|haze|smoke/.test(t)) return ["fog", 3];
@@ -2045,6 +2119,8 @@ room.addEventListener("click", e => {
   }
   const leafEl = t.closest(".floor-leaf");
   if (leafEl) return gust(leafEl);
+  if (t.closest(".watch-cat") && window.catRide) return window.catRide();
+  if (t.closest(".floor") && !t.closest(".hubert-hit") && window.hubertCrumb && window.hubertCrumb(e)) return;
   const pumpkin = t.closest("svg.pumpkin");
   if (pumpkin) return replay(pumpkin, "scary", 1100);
   const small = t.closest(".glasses, .mug");  // things on the table and the armrest
@@ -2131,14 +2207,14 @@ tickClock();
 
 function applyLook() {
   // previews: #dusk, #night-snow, #dec24, #night-snow-dec24
-  const h = location.hash.match(/^#(?:(night|dawn|day|dusk)(?:-(clear|cloudy|rain|snow|fog))?)?(?:-?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)(\d{1,2})?)?$/);
+  const h = location.hash.match(/^#(?:(night|dawn|day|dusk)(?:-(clear|cloudy|rain|storm|snow|fog))?)?(?:-?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)(\d{1,2})?)?$/);
   const m = h && (h[1] || h[3]) ? h : null;
   const now = Date.now();
   if (!sky.rise || Math.abs(now - sky.rise) > 20 * 36e5) Object.assign(sky, sunTimes(now));
   let phase = phaseAt(now, sky.rise, sky.set), cond = sky.cond, clouds = sky.clouds;
   if (m && m[1]) {
     phase = m[1];
-    if (m[2]) [cond, clouds] = m[2] === "clear" ? ["clear", 1] : condFrom(m[2] === "cloudy" ? "cloudy" : m[2]);
+    if (m[2]) [cond, clouds] = m[2] === "clear" ? ["clear", 1] : condFrom(m[2] === "storm" ? "thunderstorm" : m[2]);
   }
   sky.shown = { phase, cond, clouds };
   room.classList.toggle("daylight", phase === "day");
@@ -2150,7 +2226,10 @@ function applyLook() {
   sky.shown.moon = moonAge(m && m[3] ? Date.UTC(t.y, t.m - 1, t.d, 26) : now);
   const occasion = renderDecor(t);
   // the cat watches the street from the windowsill at dusk and sleeps under a blanket in winter
-  room.classList.toggle("cat-out", phase === "dusk");
+  room.classList.toggle("cat-out", phase === "dusk" && cond !== "storm");
+  room.classList.toggle("storm", cond === "storm");  // the cat hides under the armchair
+  room.classList.toggle("fireflies", t.m >= 6 && t.m <= 8 && (phase === "night" || phase === "dusk") && (cond === "clear" || cond === "cloudy"));
+  if (cond === "storm" && !m) logSee("storm", 1, "day");
   room.classList.toggle("winter", t.m === 12 || t.m <= 2);
   sky.fireworks = fireworksDay(t);
   sky.santa = t.m === 12 && t.d === 24;
@@ -2190,7 +2269,7 @@ async function loadWeather() {
 
 (function drawSky() {
   const cv = document.getElementById("sky");
-  const ctx = cv.getContext("2d");
+  let ctx = cv.getContext("2d");
   const W = cv.width, H = cv.height;
   const r = rng(42);
   const stars = Array.from({ length: 90 }, () => ({ x: r() * W, y: r() * H * 0.6, s: r() * 1.6 + 0.4, p: r() * 6.28 }));
@@ -2212,7 +2291,7 @@ async function loadWeather() {
   function pickVisitor() {
     const { phase, cond } = sky.shown || {};
     const m = sky.month || 1;
-    if (cond === "rain" || cond === "fog") return null;
+    if (cond === "rain" || cond === "storm" || cond === "fog") return null;
     if (catOnSill()) return null;  // nobody lands with the cat on the sill
     if (phase === "night") {
       const night = [];
@@ -2328,6 +2407,26 @@ async function loadWeather() {
     v.x = x;
     drawSquirrel(x, v.landY, face, running, e, v.fur);
   }
+  // the logbook's pictures: the same drawings, on a little canvas of their own
+  window.visitorIcon = kind => {
+    const c = document.createElement("canvas"), keep = ctx, S = 240;
+    c.width = c.height = S; ctx = c.getContext("2d");
+    try {
+      if (BIRDS[kind]) drawBird(BIRDS[kind], 120, 160, 1, false, 0);
+      else if (kind === "squirrel") drawSquirrel(120, 170, 1, false, 0, FURS[0]);
+      else if (kind === "raccoon") drawRaccoonPeek(120, 200, 0);
+      else if (kind === "ufo") drawUfoShape(120, 120, 1);
+      else drawInsect(kind, 120, 120, 200, kind === "moth");  // wings open
+      // crop to what was drawn, as a square
+      const px = ctx.getImageData(0, 0, S, S).data;
+      let x0 = S, y0 = S, x1 = 0, y1 = 0;
+      for (let i = 3; i < px.length; i += 4) if (px[i] > 20) { const x = (i >> 2) % S, y = (i >> 2) / S | 0; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+      const side = Math.max(x1 - x0, y1 - y0) + 4, out = document.createElement("canvas");
+      out.width = out.height = side;
+      out.getContext("2d").drawImage(c, (x0 + x1 - side) / 2, (y0 + y1 - side) / 2, side, side, 0, 0, side, side);
+      return out.toDataURL();
+    } finally { ctx = keep; }
+  };
   // ---- a red streetcar goes by below now and then; click it and it rings
   let tram = null, nextTram = 20e3 + Math.random() * 30e3;
   window.sendStreetcar = () => { if (!tram) nextTram = clock; };
@@ -2359,7 +2458,7 @@ async function loadWeather() {
   const bursts = [];
   let nextBurst = 0;
   function drawFireworks(t, phase, cond) {
-    if (!sky.fireworks || still || phase === "day" || phase === "dawn" || cond === "rain" || cond === "fog") { bursts.length = 0; return; }
+    if (!sky.fireworks || still || phase === "day" || phase === "dawn" || cond === "rain" || cond === "storm" || cond === "fog") { bursts.length = 0; return; }
     if (t >= nextBurst) {
       bursts.push({ t, x: W * (0.12 + Math.random() * 0.76), y: H * (0.12 + Math.random() * 0.3), n: 24 + Math.floor(Math.random() * 14),
         c: ["#ff5a4a", "#ffd84d", "#7ce0ff", "#c09aff", "#8cff9a", "#ffffff"][Math.floor(Math.random() * 6)] });
@@ -2385,21 +2484,25 @@ async function loadWeather() {
   const onTower = (x, y) => Math.abs(x - TOWER_X) < (y > H - 270 ? 22 : 10) && y > H - 350;
   cv.addEventListener("click", e => {
     const [x, y] = canvasPoint(e);
+    const fly = fliesOn() && flies.find(f => clock >= f.back && Math.hypot(...flyAt(f, clock).map((v, i) => v - [x, y][i])) < 26);
     if (onSanta(x, y)) {
       hoHoHo(e);
+      logSee("santa");
       window.open("https://santatracker.google.com/", "_blank", "noopener");
     }
+    else if (fly) { fly.back = clock + 8e3 + Math.random() * 8e3; catchFirefly(e.clientX, e.clientY); }
     else if (onVisitor(x, y)) visitor.flee = { t: clock, x: visitor.x, y: visitor.y, rise: visitor.rise };
     else if (tram && x > tram.x && x < tram.x + 170 && y > tram.y - 30) tram.ding = clock;
     else if (onTower(x, y) && !ufo && !still) {
       const hx = W * 0.64;
       const b = buildings.find(b => hx >= b.x && hx <= b.x + b.w) || { h: 80 };
       ufo = { start: clock, hx, roof: H - b.h };
+      logSee("ufo");
     }
   });
   cv.addEventListener("mousemove", e => {
     const [x, y] = canvasPoint(e);
-    cv.style.cursor = onSanta(x, y) || onVisitor(x, y) || onTower(x, y) || (tram && x > tram.x && x < tram.x + 170 && y > tram.y - 30) ? "pointer" : "";
+    cv.style.cursor = onSanta(x, y) || (fliesOn() && flies.some(f => clock >= f.back && Math.hypot(...flyAt(f, clock).map((v, i) => v - [x, y][i])) < 26)) || onVisitor(x, y) || onTower(x, y) || (tram && x > tram.x && x < tram.x + 170 && y > tram.y - 30) ? "pointer" : "";
   });
   function drawRaccoon(x, y, spin) {
     ctx.save(); ctx.translate(x, y); ctx.rotate(spin); ctx.scale(1.5, 1.5);
@@ -2527,7 +2630,9 @@ async function loadWeather() {
       drawRaccoon(x, ry, q * 0.8 * Math.sin(e / 400));
       ctx.globalAlpha = 1;
     }
-    // the saucer
+    drawUfoShape(x, y, scale, e);
+  }
+  function drawUfoShape(x, y, scale = 1, e = 0) {  // the saucer
     ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
     ctx.fillStyle = "rgba(160,225,240,.85)"; ctx.beginPath(); ctx.ellipse(0, -5, 11, 9, 0, Math.PI, 0); ctx.fill();
     ctx.fillStyle = "#9aa4ad"; ctx.beginPath(); ctx.ellipse(0, 0, 28, 7.5, 0, 0, Math.PI * 2); ctx.fill();
@@ -2560,6 +2665,7 @@ async function loadWeather() {
       visitor = { kind, insect, start: t, fromLeft, landX, landY: kind === "moth" ? H * 0.3 : H - 4 - drift,
         sit: 5e3 + Math.random() * 5e3, startY: 60 + Math.random() * 140, fur: FURS[Math.random() < 0.6 ? 0 : 1] };
       if (kind === "raccoon") visitor.landY = H - 2;
+      logSee(kind);
     }
     if (!visitor) return;
     if (visitor.kind === "raccoon" || visitor.kind === "squirrel") return drawCritter(t);
@@ -2590,6 +2696,45 @@ async function loadWeather() {
 
   const cloudSeeds = Array.from({ length: 7 }, (_, i) => ({ x: r() * W, y: 30 + r() * 150, s: 0.7 + r() * 0.8, v: 0.04 + r() * 0.05 }));
   const drops = Array.from({ length: 160 }, () => ({ x: r() * W, y: r() * H, v: 0.5 + r() * 0.5, s: r() }));
+  const drops2 = Array.from({ length: 120 }, () => ({ x: r() * W, y: r() * H, v: 0.6 + r() * 0.5, s: r() }));
+  // ---- thunderstorms: now and then a flash, sometimes with a bolt over the city; the room lights up too
+  let bolt = null, nextBolt = 2500;
+  const flashEl = document.getElementById("flash");
+  function drawLightning(t) {
+    if (still) return;
+    if (!bolt && t >= nextBolt) {
+      const pts = [], x0 = W * (0.15 + Math.random() * 0.7);
+      for (let y = 0, x = x0; y < H - 120; y += 18 + Math.random() * 16) { pts.push([x, y]); x += (Math.random() - 0.5) * 34; }
+      bolt = { t, pts, strike: Math.random() < 0.6 };
+      replay(flashEl, "flashing", 900);
+      room.classList.add("flash"); setTimeout(() => room.classList.remove("flash"), 900);
+    }
+    if (!bolt) return;
+    const e = t - bolt.t;
+    if (e > 900) { bolt = null; nextBolt = t + 3500 + Math.random() * 9000; return; }
+    const a = e < 90 ? 1 : e < 170 ? 0.25 : e < 300 ? 0.85 : 0.85 * (1 - (e - 300) / 600);
+    ctx.fillStyle = `rgba(225,232,255,${(a * 0.5).toFixed(3)})`; ctx.fillRect(0, 0, W, H);
+    if (bolt.strike && e < 320) {
+      ctx.save(); ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = 2.4; ctx.shadowColor = "#bcd0ff"; ctx.shadowBlur = 14;
+      ctx.beginPath(); bolt.pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); ctx.restore();
+    }
+  }
+  // ---- summer nights: fireflies blink over the city; click one and it goes into the jar on the sill
+  const flies = Array.from({ length: 9 }, () => ({ x: r() * W, y: H * (0.5 + r() * 0.4), p: r() * 6.28, s: 0.6 + r() * 0.8, back: 0 }));
+  const fliesOn = () => !still && room.classList.contains("fireflies");
+  function flyAt(f, t) { return [f.x + Math.sin(t / 2300 * f.s + f.p) * 40, f.y + Math.sin(t / 1700 * f.s + f.p * 2) * 18]; }
+  function flyGlow(f, t) { return Math.max(0, Math.sin(t / 650 * f.s + f.p)) ** 2; }
+  function drawFireflies(t) {
+    if (!fliesOn()) return;
+    flies.forEach(f => {
+      if (t < f.back) return;
+      const [x, y] = flyAt(f, t), a = flyGlow(f, t);
+      ctx.fillStyle = `rgba(214,255,120,${(0.15 + 0.85 * a).toFixed(3)})`;
+      ctx.shadowColor = "#d8ff7a"; ctx.shadowBlur = 16 * a;
+      ctx.beginPath(); ctx.arc(x, y, 3.2 + 1.6 * a, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+  }
   const fogBands = [0.55, 0.72, 0.86].map((y, i) => ({ y: H * y, a: 0.22 + i * 0.06, o: r() * W }));
 
   // sky colours: top, middle, horizon
@@ -2603,7 +2748,7 @@ async function loadWeather() {
   const BLDG = { night: "#0e1426", dawn: "#22243a", day: "#56657a", dusk: "#1d1f33" };
   const LIT = { night: 0.36, dawn: 0.16, day: 0, dusk: 0.24 };
   const CLOUD = { night: "#2a2f3d", dawn: "#c9a4ad", day: "#f4f6f8", dusk: "#8a6377" };
-  const GREYNESS = { clear: 0, cloudy: 0.65, rain: 0.75, snow: 0.55, fog: 0.5 };
+  const GREYNESS = { clear: 0, cloudy: 0.65, rain: 0.75, storm: 0.9, snow: 0.55, fog: 0.5 };
 
   function mix(a, b, t) {
     const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
@@ -2698,21 +2843,24 @@ async function loadWeather() {
         else if (phase === "day") { ctx.fillStyle = "rgba(220,235,250,.35)"; ctx.fillRect(cx, cy, 6, 8); }
       });
     });
+    drawFireflies(t);
     drawTram(t, phase);
     drawVisitor(t);
     drawUfo(t);
     drawSanta(t, phase);
     // weather in front of the city
-    if (cond === "rain") {
+    if (cond === "rain" || cond === "storm") {
+      const storm = cond === "storm", speed = storm ? 1.3 : 0.9, slant = storm ? 0.3 : 0.12;
       ctx.strokeStyle = phase === "day" ? "rgba(235,240,250,.55)" : "rgba(190,205,230,.45)";
       ctx.lineWidth = 1.2;
       ctx.beginPath();
-      drops.forEach(d => {
-        const y = still ? d.y : (d.y + t * 0.9 * d.v) % (H + 30) - 15;
-        const x = (d.x - y * 0.12 + W) % W;
-        ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 16);
+      (storm ? drops.concat(drops2) : drops).forEach(d => {
+        const y = still ? d.y : (d.y + t * speed * d.v) % (H + 30) - 15;
+        const x = (d.x - y * slant + W) % W;
+        ctx.moveTo(x, y); ctx.lineTo(x - 16 * slant - 1, y + 18);
       });
       ctx.stroke();
+      if (storm) drawLightning(t);
     } else if (cond === "snow") {
       ctx.fillStyle = "rgba(255,255,255,.9)";
       drops.forEach(d => {
@@ -2756,6 +2904,91 @@ setInterval(applyLook, 60e3);
 loadWeather();
 setInterval(loadWeather, 15 * 60e3);
 
+// ---- the firefly jar: caught fireflies glow in it; click it to let them all go
+const ffJar = document.getElementById("ff-jar");
+let ffCount = 0;
+function windowPoint(clientX, clientY) {  // a screen point in the window-wrap's own (unzoomed) pixels
+  const wrap = ffJar.parentElement, wr = wrap.getBoundingClientRect(), k = wrap.offsetWidth / wr.width;
+  return [(clientX - wr.left) * k, (clientY - wr.top) * k];
+}
+function catchFirefly(clientX, clientY) {
+  const wrap = ffJar.parentElement, [x, y] = windowPoint(clientX, clientY);
+  const fly = document.createElement("span");
+  fly.className = "ff-fly"; fly.style.left = x + "px"; fly.style.top = y + "px";
+  wrap.appendChild(fly);
+  void fly.offsetWidth;
+  fly.style.left = ffJar.offsetLeft + 15 + "px"; fly.style.top = ffJar.offsetTop + 24 + "px";
+  setTimeout(() => {
+    fly.remove();
+    ffCount++;
+    if (ffCount <= 14) {  // a full jar takes no more
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("class", "ff-dot");
+      dot.setAttribute("cx", (7 + Math.random() * 16).toFixed(1)); dot.setAttribute("cy", (17 + Math.random() * 18).toFixed(1));
+      dot.setAttribute("r", "1.6"); dot.setAttribute("fill", "#e2ff8a");
+      dot.style.animationDelay = (Math.random() * -2.4).toFixed(2) + "s";
+      ffJar.querySelector(".ff-in").appendChild(dot);
+    }
+    ffJar.style.setProperty("--n", Math.min(ffCount, 14));
+  }, 900);
+  logSee("firefly");
+}
+ffJar.addEventListener("click", e => {  // open the lid: they fly back out into the night
+  e.stopPropagation();
+  const wrap = ffJar.parentElement;
+  ffJar.querySelectorAll(".ff-dot").forEach((d, i) => {
+    const fly = document.createElement("span");
+    fly.className = "ff-fly";
+    fly.style.left = ffJar.offsetLeft + 15 + "px"; fly.style.top = ffJar.offsetTop + 20 + "px";
+    wrap.appendChild(fly);
+    setTimeout(() => {
+      fly.classList.add("free");
+      fly.style.left = ffJar.offsetLeft + 15 + (Math.random() - 0.3) * 220 + "px"; fly.style.top = ffJar.offsetTop - 80 - Math.random() * 200 + "px";
+    }, 30 + i * 90);
+    setTimeout(() => fly.remove(), 2600 + i * 90);
+    d.remove();
+  });
+  ffCount = 0; ffJar.style.setProperty("--n", 0);
+});
+
+// ---- the visitors' log on the side table
+const LOG_ENTRIES = [
+  ["chickadee", "Black-capped chickadee", "all year, by day"],
+  ["bluejay", "Blue jay", "all year, by day"],
+  ["cardinal", "Northern cardinal", "November to March"],
+  ["robin", "American robin", "March to October"],
+  ["squirrel", "Eastern grey squirrel", "autumn, often a black one"],
+  ["butterfly", "Monarch butterfly", "summer days"],
+  ["bee", "Bumblebee", "summer days"],
+  ["moth", "Moth", "summer nights"],
+  ["raccoon", "Raccoon", "nights, spring to autumn"],
+  ["ufo", "UFO", "raccoons beamed up from the CN Tower"],
+  ["firefly", "Fireflies", "caught on summer nights", "\u2728"],
+  ["hubert", "Hubert", "visits by the vacuum robot", "\u{1F916}"],
+  ["ride", "Cat rides Hubert", "she has to want to", "\u{1F408}"],
+  ["storm", "Thunderstorms", "days with a storm over Toronto", "\u26C8\uFE0F"],
+  ["santa", "Santa", "waved at on Christmas Eve", "\u{1F385}"]
+];
+const logDlg = document.getElementById("logdlg");
+document.getElementById("logbook").addEventListener("click", e => {
+  e.stopPropagation();
+  const fmt = ms => new Date(ms).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
+  const list = document.getElementById("log-list");
+  list.innerHTML = "";
+  LOG_ENTRIES.forEach(([key, name, hint, emoji]) => {
+    const seen = roomLog[key], li = document.createElement("li");
+    li.className = seen ? "seen" : "unseen";
+    const pic = emoji ? `<span class="emoji" aria-hidden="true">${emoji}</span>` : `<img alt="" src="${window.visitorIcon ? window.visitorIcon(key) : ""}">`;
+    const what = seen ? `${seen.n} \u00d7 \u00b7 first ${fmt(seen.first)}` : hint;
+    li.innerHTML = `${pic}<span><b>${name}</b><small></small></span>`;
+    li.querySelector("small").textContent = what;
+    list.appendChild(li);
+  });
+  logDlg.showModal();
+});
+document.getElementById("log-close").addEventListener("click", () => logDlg.close());
+logDlg.addEventListener("click", e => { if (e.target === logDlg) logDlg.close(); });
+
 // Hubert, the vacuum robot: now and then he drives in from the right, wanders the floor in gentle curves,
 // bumps into the furniture (stop, back up a little, turn a bit, carry on), blows up the leaves he drives over
 // and leaves again. The cat watches him from the windowsill.
@@ -2763,9 +2996,37 @@ setInterval(loadWeather, 15 * 60e3);
   if (reduceMotion) return;
   const cv = document.getElementById("hubert"), ctx = cv.getContext("2d"), hit = document.getElementById("hubert-hit");
   const floor = cv.parentElement, chairCat = document.querySelector(".chair .cat"), watcher = document.querySelector(".watch-cat");
-  const R = 30, K = 0.42, H = 12, TOP = 30, SPEED = 42;  // half-size, depth squash, body height, canvas offset, px/s
+  const R = 30, K = 0.42, H = 12, TOP = 80, CH = 150, SPEED = 42;  // half-size, depth squash, body height, canvas offset and height, px/s
   let bot = null, next = performance.now() + 120e3 + Math.random() * 180e3, W = 0, dpr = 1;
   window.sendHubert = () => { if (!bot) start(performance.now()); };
+  // guide him: a click on the floor drops a crumb, and he heads for it
+  let crumbs = [];
+  window.hubertCrumb = e => {
+    if (!bot) return false;
+    const fr = floor.getBoundingClientRect();
+    const x = Math.max(R + 6, Math.min(W - R - 6, (e.clientX - fr.left) * W / fr.width));
+    const y = Math.max(R * K + 4, Math.min(64 - R * K, (e.clientY - fr.top) * floor.offsetHeight / fr.height));
+    crumbs.push({ x, y, bits: Array.from({ length: 4 }, () => [(Math.random() - 0.5) * 7, (Math.random() - 0.5) * 3, 1 + Math.random()]) });
+    if (crumbs.length > 4) crumbs.shift();
+    const now = performance.now();
+    bot.stay = Math.max(bot.stay, now - bot.start + 15e3);  // he stays while there's something to find
+    return true;
+  };
+  // the cat, clicked on the windowsill while he's about, jumps down and rides him
+  window.catRide = () => {
+    if (!bot || bot.rider || bot.leaving || watcher.classList.contains("pounce")) return;
+    watcher.classList.add("pounce");
+    setTimeout(() => {
+      watcher.classList.remove("pounce");
+      if (!bot) return;
+      bot.rider = performance.now();
+      room.classList.add("riding");
+      logSee("ride");
+      // startled by the landing: a full turn, then off on a short tour and out
+      Object.assign(bot, { state: "bump", t: bot.last, wait: 300, spin: true, turn: (Math.random() < 0.5 ? -1 : 1) * Math.PI * 2 });
+      bot.stay = Math.min(bot.stay, bot.last - bot.start + 16e3);
+    }, 420);
+  };
   ["mouseenter", "focus"].forEach(ev => hit.addEventListener(ev, () => showNote(hit, "Hubert, the vacuum robot")));
   hit.addEventListener("mouseleave", hideTip);
   hit.addEventListener("click", () => {  // as if he bumped into something: stop, turn once all the way round, carry on
@@ -2775,10 +3036,12 @@ setInterval(loadWeather, 15 * 60e3);
 
   function start(now) {
     W = floor.clientWidth; dpr = (window.devicePixelRatio || 1) * Math.max(1, parseFloat(floor.style.zoom) || 1);
-    cv.width = W * dpr; cv.height = 100 * dpr;
+    cv.width = W * dpr; cv.height = CH * dpr;
     bot = { x: W + R + 10, y: 34 + Math.random() * 12, a: Math.PI + (Math.random() - 0.5) * 0.4, state: "drive", t: now, last: now,
       start: now, stay: 55e3 + Math.random() * 30e3, turn: 0, eye: [{ x: 0, y: 0, vx: 0, vy: 0 }, { x: 0, y: 0, vx: 0, vy: 0 }], gone: false };
     hit.style.display = "block";
+    crumbs = [];
+    logSee("hubert");
     // the cat has had enough: up onto the windowsill
     chairCat.classList.add("hop");
     setTimeout(() => {
@@ -2840,22 +3103,50 @@ setInterval(loadWeather, 15 * 60e3);
     }
   }
 
+  function drawCrumb(c) {
+    ctx.fillStyle = "#d9b27a";
+    c.bits.forEach(([dx, dy, s]) => { ctx.beginPath(); ctx.arc(c.x + dx, c.y + TOP + dy, s, 0, Math.PI * 2); ctx.fill(); });
+  }
+  // the cat, sitting on his lid and facing the way he goes, her tail hanging over the edge
+  function drawRider(b, now) {
+    const y = b.y + TOP - H - 1, dir = Math.cos(b.a) >= 0 ? 1 : -1, sway = Math.sin(now / 380) * 0.25;
+    const hop = Math.max(0, 1 - (now - b.rider) / 300);  // the landing
+    ctx.save(); ctx.translate(b.x - dir * 3, y - hop * 26); ctx.scale(dir, 1);
+    ctx.strokeStyle = "#b96d2f"; ctx.lineWidth = 4.5; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(-10, -4); ctx.quadraticCurveTo(-22, -2 + sway * 10, -24, 8 + sway * 6); ctx.stroke();
+    ctx.fillStyle = "#c87a3a";
+    ctx.beginPath(); ctx.ellipse(-1, -11, 12, 11, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#e8b07a"; ctx.beginPath(); ctx.ellipse(6, -9, 5, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#c87a3a"; ctx.fillRect(4, -6, 4, 7); ctx.fillRect(9, -6, 4, 7);
+    ctx.fillStyle = "#d88a45"; ctx.beginPath(); ctx.arc(6, -26, 8, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#c87a3a"; ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(1, -40); ctx.lineTo(6, -33); ctx.moveTo(8, -33); ctx.lineTo(13, -40); ctx.lineTo(13, -29); ctx.fill();
+    ctx.strokeStyle = "#a8622a"; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-8, -16); ctx.lineTo(-3, -14); ctx.moveTo(-10, -10); ctx.lineTo(-4, -9); ctx.stroke();
+    ctx.strokeStyle = "#4a2d18"; ctx.lineWidth = 1.2;  // pleased: eyes shut in a smile
+    ctx.beginPath(); ctx.arc(5, -27, 1.6, Math.PI * 0.1, Math.PI * 0.9); ctx.moveTo(12.6, -27); ctx.arc(11, -27, 1.6, Math.PI * 0.1, Math.PI * 0.9); ctx.stroke();
+    ctx.fillStyle = "#e8a8a0"; ctx.beginPath(); ctx.arc(9, -23.5, 1.2, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
   function frame(now) {
     const b = bot;
     if (!b) return;
     const dt = Math.min(0.05, (now - b.last) / 1000); b.last = now;
-    const leaving = now - b.start > b.stay;
+    const leaving = b.leaving = now - b.start > b.stay && !crumbs.length;
     let v = 0;
     const turnTo = (dir, amount, wait) => { b.state = "bump"; b.t = now; b.turn = dir * amount; b.wait = wait; };
     if (b.state === "drive") {
       v = SPEED;
       // not quite straight: a slow meander, and on the way out a pull to the right
-      b.a += Math.sin((now - b.start) / 1700) * 0.35 * dt;
-      if (leaving) { const d = Math.atan2(Math.sin(-b.a), Math.cos(-b.a)); if (Math.abs(d) > 0.5) b.a += Math.sign(d) * 0.9 * dt; }
+      const crumb = crumbs.length && crumbs.reduce((m, c) => Math.hypot(c.x - b.x, (c.y - b.y) / K) < Math.hypot(m.x - b.x, (m.y - b.y) / K) ? c : m);
+      if (crumb) {  // heading for the nearest crumb
+        const d = Math.atan2(Math.sin(Math.atan2((crumb.y - b.y) / K, crumb.x - b.x) - b.a), Math.cos(Math.atan2((crumb.y - b.y) / K, crumb.x - b.x) - b.a));
+        b.a += Math.sign(d) * Math.min(Math.abs(d), 2.4 * dt);
+      } else b.a += Math.sin((now - b.start) / 1700) * 0.35 * dt;
+      if (leaving && !crumb) { const d = Math.atan2(Math.sin(-b.a), Math.cos(-b.a)); if (Math.abs(d) > 0.5) b.a += Math.sign(d) * 0.9 * dt; }
       const nx = b.x + Math.cos(b.a) * v * dt, ny = b.y + Math.sin(b.a) * v * dt * K;
       const c = Math.cos(b.a), sn = Math.sin(b.a);  // only what he's driving towards counts
       const back = sn < 0 && ny - R * K < 2, front = sn > 0 && ny + R * K > 66;
-      const left = c < 0 && nx - R < 4, right = c > 0 && !leaving && nx + R > W - 4;
+      const left = c < 0 && nx - R < 4, right = c > 0 && !(leaving && !crumbs.length) && nx + R > W - 4;
       if (back || left || right) {  // ran into the furniture or a wall: turn a little away from it
         const away = back ? (Math.cos(b.a) >= 0 ? 1 : -1) : (Math.sin(b.a) >= 0 ? 1 : -1) * (left ? -1 : 1);
         turnTo(away, 0.35 + Math.random() * 0.45, 450 + Math.random() * 300);
@@ -2893,9 +3184,13 @@ setInterval(loadWeather, 15 * 60e3);
         gust(leaf, { dir: Math.cos(b.a) * (v < 0 ? -1 : 1) >= 0 ? -1 : 1, T: 5600 });
       } else leaf.style.zIndex = ly < b.y ? 1 : 3;
     });
+    crumbs = crumbs.filter(c => Math.hypot(c.x - b.x, (c.y - b.y) / K) > R * 0.7);  // vacuumed up
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, W, 100);
+    ctx.clearRect(0, 0, W, CH);
+    crumbs.filter(c => c.y < b.y).forEach(drawCrumb);
     draw(b, now);
+    if (b.rider) drawRider(b, now);
+    crumbs.filter(c => c.y >= b.y).forEach(drawCrumb);
     hit.style.left = b.x + "px"; hit.style.top = b.y + "px";
     // the cat follows him with her eyes
     const wr = watcher.getBoundingClientRect(), fr = floor.getBoundingClientRect();
@@ -2904,7 +3199,8 @@ setInterval(loadWeather, 15 * 60e3);
     requestAnimationFrame(frame);
   }
   function stop(now) {
-    bot = null;
+    bot = null; crumbs = [];
+    setTimeout(() => room.classList.remove("riding"), 5000);  // she rode out with him; back in her chair soon
     ctx.clearRect(0, 0, cv.width, cv.height);
     hit.style.display = "none"; hideTip();
     setTimeout(() => { if (!bot) room.classList.remove("hubert"); }, 5000);  // she waits a little before coming down
@@ -2914,7 +3210,7 @@ setInterval(loadWeather, 15 * 60e3);
   setInterval(() => {
     const now = performance.now();
     if (!bot && now > next && !document.hidden) {
-      if (sky.shown && sky.shown.phase === "night") next = now + 600e3;
+      if (sky.shown && (sky.shown.phase === "night" || sky.shown.cond === "storm")) next = now + 600e3;
       else start(now);
     }
   }, 5000);
