@@ -334,6 +334,7 @@ html.phone, html.phone body { height: 100%; overflow: hidden; overscroll-behavio
 .d-item svg * { pointer-events: visiblePainted; cursor: pointer; }
 .deco, .cat, .lamp, .glasses, .mug { cursor: pointer; }
 .wiggle { animation: wiggle .7s ease-in-out; transform-origin: 50% 100%; }
+svg .part { transform-box: fill-box; }
 .swing { animation: swing 1.2s ease-in-out; transform-origin: 50% 0; }
 .bounce { animation: bounce .9s ease-in-out; }
 @keyframes wiggle { 20% { rotate: -5deg; } 45% { rotate: 4deg; } 70% { rotate: -2deg; } 100% { rotate: 0deg; } }
@@ -1769,17 +1770,17 @@ const DECOR = [
       const peanut = (x, y, rot) => `<g transform="translate(${x} ${y}) rotate(${rot})"><path d="M-5 0 Q-5 -3.2 -2.4 -3 Q0 -1.6 2.4 -3 Q5 -3.2 5 0 Q5 3.2 2.4 3 Q0 1.6 -2.4 3 Q-5 3.2 -5 0 Z" fill="#c9a06a" stroke="#9a7444" stroke-width=".6"/></g>`;
       const sweet = (x, y, c, rot = 0) => `<g transform="translate(${x} ${y}) rotate(${rot})"><path d="M-7 -3 L-4 0 L-7 3 Z M7 -3 L4 0 L7 3 Z" fill="${c}"/><ellipse cx="0" cy="0" rx="4.4" ry="3.4" fill="${c}"/>
         <path d="M-2 -2 Q0 -3 2 -2" stroke="#fff" stroke-opacity=".6" stroke-width=".8" fill="none"/></g>`;
-      const goodies = t.d === 6
-        ? `<circle cx="28" cy="9" r="6.5" fill="#f08a1c"/><path d="M27 3 q2 -3 4 -2" stroke="#4f7a3e" stroke-width="1.5" fill="none"/>${nikolaus(35, 1)}
-          ${peanut(62, 9, 20)}${peanut(70, 7, -30)}${sweet(66, 3, "#2f7a3e", -20)}${nikolaus(73, 2, 0.8)}`
-        : "";
-      const beside = t.d === 6  // on the floor by the boots: what didn't fit
-        ? `${nikolaus(100, 42, 1.1)}${peanut(88, 54, 10)}${peanut(112, 55, -25)}${peanut(118, 52, 40)}${sweet(90, 47, "#c8202a", 15)}${sweet(110, 48, "#e8b400", -10)}${sweet(120, 56, "#3f6fc8", 25)}`
-        : `<path d="M84 46 Q86 57 97 57 Q108 57 110 46 Z" fill="#e8eef4" stroke="#9aaabb" stroke-width=".8"/><ellipse cx="97" cy="46" rx="13" ry="2.6" fill="#fbfbf6" stroke="#9aaabb" stroke-width=".8"/>
-          <path d="M86 50 H108" stroke="#5f8ac8" stroke-width="1.4"/>
-          ${[[115, 56, 0], [114, 52, 0], [117, 47, -60]].map(([x, y, rot]) => `<g transform="translate(${x} ${y}) rotate(${rot})"><ellipse cx="0" cy="0" rx="6" ry="${rot ? 6 : 2}" fill="#c48a4a"/>
-            <circle cx="-2" cy="-.4" r=".9" fill="#4a2d18"/><circle cx="2" cy=".3" r=".9" fill="#4a2d18"/></g>`).join("")}`;
-      return `<svg width="163" height="99" viewBox="-4 -18 128 76">${goodies}${boot(60, "#6b4428")}${boot(24, "#5a3a22")}${beside}</svg>`;
+      const part = x => `<g class="part">${x}</g>`;  // wobbles on its own
+      const full = t.d === 6;
+      const left = full ? `<circle cx="28" cy="9" r="6.5" fill="#f08a1c"/><path d="M27 3 q2 -3 4 -2" stroke="#4f7a3e" stroke-width="1.5" fill="none"/>${nikolaus(35, 1)}` : "";
+      const right = full ? `${peanut(62, 9, 20)}${peanut(70, 7, -30)}${sweet(66, 3, "#2f7a3e", -20)}${nikolaus(73, 2, 0.8)}` : "";
+      const beside = full  // on the floor by the boots: what didn't fit
+        ? [nikolaus(100, 42, 1.1), peanut(88, 54, 10), peanut(112, 55, -25), peanut(118, 52, 40), sweet(90, 47, "#c8202a", 15), sweet(110, 48, "#e8b400", -10), sweet(120, 56, "#3f6fc8", 25)].map(part).join("")
+        : part(`<path d="M84 46 Q86 57 97 57 Q108 57 110 46 Z" fill="#e8eef4" stroke="#9aaabb" stroke-width=".8"/><ellipse cx="97" cy="46" rx="13" ry="2.6" fill="#fbfbf6" stroke="#9aaabb" stroke-width=".8"/>
+          <path d="M86 50 H108" stroke="#5f8ac8" stroke-width="1.4"/>`) +
+          part([[115, 56, 0], [114, 52, 0], [117, 47, -60]].map(([x, y, rot]) => `<g transform="translate(${x} ${y}) rotate(${rot})"><ellipse cx="0" cy="0" rx="6" ry="${rot ? 6 : 2}" fill="#c48a4a"/>
+            <circle cx="-2" cy="-.4" r=".9" fill="#4a2d18"/><circle cx="2" cy=".3" r=".9" fill="#4a2d18"/></g>`).join(""));
+      return `<svg data-click="parts" width="163" height="99" viewBox="-4 -18 128 76">${part(right + boot(60, "#6b4428"))}${part(left + boot(24, "#5a3a22"))}${beside}</svg>`;
     } },
   { slot: "sill-l", label: () => "Cozy season", when: t => t.n >= dayNum(t.y, 11, 12) && t.n < advent1(t.y) && !diwali(t),
     svg: () => `<svg data-click="candles" width="70" height="36" viewBox="0 0 70 36">${[10, 32, 54].map((x, i) =>
@@ -2086,6 +2087,10 @@ room.addEventListener("click", e => {
     case "candles": {  // each candle on its own
       const candle = t.closest(".candle");
       return candle ? candle.classList.toggle("lit") : replay(item, "wiggle", 800);
+    }
+    case "parts": {  // each piece on its own
+      const piece = t.closest(".part");
+      return replay(piece || item, "wiggle", 800);
     }
     case "lights": return art.classList.toggle("lights-off");
     case "snowglobe": replay(art, "shaken", 3600); return replay(item, "wiggle", 800);
