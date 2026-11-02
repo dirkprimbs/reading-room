@@ -689,7 +689,7 @@ svg .part { transform-box: fill-box; }
 .log-list .emoji { font-size: 30px; text-align: center; line-height: 46px; }
 .log-list li.unseen .emoji { filter: grayscale(1) opacity(.35); }
 @media (max-width: 520px) { .log-list { grid-template-columns: 1fr; } }
-.hubert-canvas { position: absolute; left: 0; top: -80px; width: 100%; height: 150px; z-index: 2; pointer-events: none; }
+.hubert-canvas { position: absolute; left: 0; top: -120px; width: 100%; height: 190px; z-index: 2; pointer-events: none; }
 .hubert-hit { position: absolute; z-index: 3; width: 70px; height: 44px; margin: -30px 0 0 -35px; display: none; pointer-events: auto; cursor: pointer; }
 /* the sort switch, written next to the bookcase */
 .sort-switch { padding: 0; background: none; border: 0; cursor: pointer; text-decoration: underline dotted rgba(187, 166, 139, .6); text-underline-offset: 5px; }
@@ -3298,7 +3298,7 @@ logDlg.addEventListener("click", e => { if (e.target === logDlg) logDlg.close();
   if (reduceMotion) return;
   const cv = document.getElementById("hubert"), ctx = cv.getContext("2d"), hit = document.getElementById("hubert-hit");
   const floor = cv.parentElement, chairCat = document.querySelector(".chair .cat"), watcher = document.querySelector(".watch-cat");
-  const R = 30, K = 0.42, H = 12, TOP = 80, CH = 150, SPEED = 42;  // half-size, depth squash, body height, canvas offset and height, px/s
+  const R = 30, K = 0.42, H = 12, TOP = 120, CH = 190, SPEED = 42;  // half-size, depth squash, body height, canvas offset and height, px/s
   let bot = null, next = performance.now() + 120e3 + Math.random() * 180e3, W = 0, dpr = 1;
   window.sendHubert = () => { if (!bot) start(performance.now()); };
   // guide him: a click on the floor drops a crumb, and he heads for it
@@ -3413,7 +3413,7 @@ logDlg.addEventListener("click", e => { if (e.target === logDlg) logDlg.close();
   function drawRider(b, now) {
     const y = b.y + TOP - H - 1, dir = Math.cos(b.a) >= 0 ? 1 : -1, sway = Math.sin(now / 380) * 0.25;
     const hop = Math.max(0, 1 - (now - b.rider) / 300);  // the landing
-    ctx.save(); ctx.translate(b.x - dir * 3, y - hop * 26); ctx.scale(dir * 1.35, 1.35);
+    ctx.save(); ctx.translate(b.x - dir * 3, y - hop * 26); ctx.scale(dir * 1.8, 1.8);
     ctx.strokeStyle = "#b96d2f"; ctx.lineWidth = 4.5; ctx.lineCap = "round";
     ctx.beginPath(); ctx.moveTo(-10, -4); ctx.quadraticCurveTo(-22, -2 + sway * 10, -24, 8 + sway * 6); ctx.stroke();
     ctx.fillStyle = "#c87a3a";
