@@ -549,7 +549,8 @@ svg .part { transform-box: fill-box; }
 .bookend.hoot .owl-pupils { animation: owl-look 1.6s ease-in-out; }
 @keyframes owl-look { 0%, 100% { translate: 0 0; } 20%, 40% { translate: -2px 0; } 60%, 80% { translate: 2px 0; } }
 /* three clicks on the mug: the cat is sitting facing it, tilts her head and pats it twice; it's hot,
-   so she shakes her paw, looks round to see who saw, and is back asleep. 7s in all.
+   so she shakes her paw and looks round to see who saw. A moment later she's standing on the seat
+   (the startled cat's look round, without the jump) and lies back down.
    .poke-cat is her sitting self; the lying cat just steps aside meanwhile. */
 .poke-cat { display: none; position: absolute; left: 30px; top: 60px; z-index: 4; pointer-events: none; opacity: 0; }
 .poke-cat svg { display: block; overflow: visible; }
@@ -560,7 +561,7 @@ svg .part { transform-box: fill-box; }
 .poke-cat.poke .pc-paw { animation: pc-paw 7s ease-in-out forwards; }
 .poke-cat.poke .pc-pupils { animation: pc-pupils 7s ease-in-out forwards; }
 .room.cat-out .poke-cat, .room.hubert .poke-cat { display: none; }
-@keyframes pc-show { 0% { opacity: 0; } 3%, 88% { opacity: 1; } 92%, 100% { opacity: 0; } }
+@keyframes pc-show { 0% { opacity: 0; } 3%, 92.8% { opacity: 1; } 95.7%, 100% { opacity: 0; } }
 @keyframes pc-head { 0%, 4% { rotate: 0deg; } 8%, 14% { rotate: -16deg; } 17%, 34% { rotate: 12deg; } 38% { rotate: 0deg; } 42%, 52% { rotate: 10deg; } 57%, 59% { rotate: 0deg; }
   63%, 67% { rotate: -8deg; } 72%, 76% { rotate: 7deg; } 81%, 100% { rotate: 0deg; } }
 @keyframes pc-paw { 0%, 17% { rotate: 0deg; } 20% { rotate: 136deg; } 23% { rotate: 150deg; } 26% { rotate: 134deg; } 29% { rotate: 150deg; } 32% { rotate: 136deg; }
@@ -568,8 +569,13 @@ svg .part { transform-box: fill-box; }
 @keyframes pc-pupils { 0%, 35% { scale: 1 1; translate: 0 0; } 37%, 50% { scale: 1.3 .5; } 54%, 59% { scale: 1 1; translate: 0 0; } 63%, 67% { translate: -1.3px 0; } 72%, 76% { translate: 1.3px 0; } 81%, 100% { translate: 0 0; } }
 .chair .cat.poke { animation: cat-poke 7s linear forwards; }
 .chair .cat.poke .zz-wrap { animation: cat-poke-zz 7s linear forwards; }
-@keyframes cat-poke { 0% { opacity: 1; } 3%, 88% { opacity: 0; } 92%, 100% { opacity: 1; } }
-@keyframes cat-poke-zz { 0%, 95% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes cat-poke { 0% { opacity: 1; } 3%, 100% { opacity: 0; } }
+@keyframes cat-poke-zz { 0%, 100% { opacity: 0; } }
+/* then up on her feet: the startled sequence from its look round on, faded in instead of jumped */
+.chair .cat.startled.settle { animation: cat-settle-in .2s linear; }
+.chair .cat.startled.settle .cat-head, .chair .cat.startled.settle .eye-open, .chair .cat.startled.settle .eye-open::after, .chair .cat.startled.settle .zz-wrap,
+.chair .cat.startled.settle .ear, .chair .cat.startled.settle .tail, .chair .cat.startled.settle .cat-legs i, .chair .cat.startled.settle .cat-lift, .chair .cat.startled.settle .body { animation-delay: -1.3s; }
+@keyframes cat-settle-in { from { opacity: 0; } }
 .mug { transition: translate .3s ease-out; }
 .mug.teeter { animation: mug-teeter 1.2s ease-in-out; transform-origin: 0 100%; }
 @keyframes mug-teeter { 15% { rotate: -14deg; } 35% { rotate: 8deg; } 55% { rotate: -6deg; } 75% { rotate: 3deg; } 100% { rotate: 0deg; } }
@@ -2236,6 +2242,11 @@ function nudgeMug(mug) {  // three quick clicks: the cat sits up and pats the mu
   const cat = document.querySelector(".chair .cat"), sitter = document.querySelector(".poke-cat");
   if (catOnSill() || room.classList.contains("storm") || catBusy(cat) || reduceMotion) return replay(mug, "wiggle", 800);
   replay(cat, "poke", 7000); replay(sitter, "poke", 7000);
+  setTimeout(() => {  // a moment after her look round: up on the seat, one more look, and down to sleep
+    cat.classList.remove("poke"); cat.classList.add("settle");
+    replay(cat, "startled", 7800);
+    setTimeout(() => cat.classList.remove("settle"), 7800);
+  }, 6500);
   const pat = (at, push) => setTimeout(() => {
     if (push) { mug._nudge = Math.min(2, (mug._nudge || 0) + 1); mug.style.translate = -mug._nudge * 4 + "px 0"; }
     replay(mug, "teeter", 1200);
