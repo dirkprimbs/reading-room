@@ -411,6 +411,12 @@ def main():
             preview = f.read()
     page = page.replace("__PREVIEW__", preview)
     page = page.replace("__WEATHER_URL__", "null" if a.no_weather else json.dumps(WEATHER_URL))
+    # the room's own pictures (the Dirk Fest sticker)
+    art = os.path.join(os.path.dirname(os.path.abspath(__file__)), "art")
+    os.makedirs(os.path.join(out, "art"), exist_ok=True)
+    for name in os.listdir(art):
+        with open(os.path.join(art, name), "rb") as f:
+            write_if_changed(os.path.join(out, "art", name), f.read())
     index = os.path.join(out, "index.html")
     # the footer date says when the shelves last changed, not when the script last ran, so
     # a rebuild without news leaves index.html untouched and a deploy has nothing to upload

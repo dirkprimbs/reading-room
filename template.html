@@ -548,10 +548,45 @@ svg .part { transform-box: fill-box; }
 .bookend .owl-pupils { transition: translate .25s ease-in-out; }
 .bookend.hoot .owl-pupils { animation: owl-look 1.6s ease-in-out; }
 @keyframes owl-look { 0%, 100% { translate: 0 0; } 20%, 40% { translate: -2px 0; } 60%, 80% { translate: 2px 0; } }
-/* the cat reaches out and nudges the mug towards the edge of the armrest */
-.cat-paw { position: absolute; left: 20px; top: 100px; width: 48px; height: 9px; z-index: 4; border-radius: 6px 4px 4px 6px; background: linear-gradient(180deg, #d88a45, #c87a3a); transform-origin: 100% 50%; scale: 0 1; pointer-events: none; }  /* from her shoulder up to the foot of the mug */
-.cat-paw.reach { animation: paw-reach 1.5s ease-in-out; }
-@keyframes paw-reach { 0% { scale: 0 1; rotate: 10deg; } 30% { scale: 1 1; rotate: 24deg; } 45% { scale: 1.1 1; rotate: 24deg; } 60% { scale: 1 1; rotate: 22deg; } 100% { scale: 0 1; rotate: 10deg; } }
+/* three clicks on the mug: the cat gets up, turns, sits facing the mug, tilts her head and pats it
+   twice; it's hot, so she shakes her paw, turns round a few times and lies down again. 10s in all.
+   The lying cat does the getting up and the circling; .poke-cat is her sitting, patting self. */
+.poke-cat { display: none; position: absolute; left: 30px; top: 60px; z-index: 4; pointer-events: none; opacity: 0; }
+.poke-cat svg { display: block; overflow: visible; }
+.poke-cat .pc-paw { transform-origin: 18px 40px; }
+.poke-cat .pc-head { transform-origin: 22px 34px; }
+.poke-cat.poke { display: block; animation: pc-show 10s linear forwards; }
+.poke-cat.poke .pc-head { animation: pc-head 10s ease-in-out forwards; }
+.poke-cat.poke .pc-paw { animation: pc-paw 10s ease-in-out forwards; }
+.poke-cat.poke .pc-pupils { animation: pc-pupils 10s ease-in-out forwards; }
+.room.cat-out .poke-cat, .room.hubert .poke-cat { display: none; }
+@keyframes pc-show { 0%, 14% { opacity: 0; } 14.5%, 59.5% { opacity: 1; } 60%, 100% { opacity: 0; } }
+@keyframes pc-head { 0%, 18% { rotate: 0deg; } 23%, 28% { rotate: -16deg; } 31%, 42% { rotate: 12deg; } 46%, 52% { rotate: 10deg; } 57%, 100% { rotate: 0deg; } }
+@keyframes pc-paw { 0%, 28% { rotate: 0deg; } 32% { rotate: 136deg; } 34.5% { rotate: 150deg; } 36.5% { rotate: 134deg; } 39% { rotate: 150deg; } 41% { rotate: 136deg; }
+  44% { rotate: 50deg; } 45.5% { rotate: 70deg; } 47% { rotate: 40deg; } 48.5% { rotate: 70deg; } 50% { rotate: 40deg; } 51.5% { rotate: 66deg; } 53% { rotate: 44deg; } 56%, 100% { rotate: 0deg; } }
+@keyframes pc-pupils { 0%, 43% { scale: 1 1; } 44%, 52% { scale: 1.3 .5; } 56%, 100% { scale: 1 1; } }
+/* the lying cat: up lazily, turn to the mug (then she sits, above), back, round and round, down */
+.chair .cat.poke { animation: cat-poke 10s ease-in-out forwards; }
+.chair .cat.poke .cat-legs i { animation: cat-poke-legs 10s ease-in-out forwards; }
+.chair .cat.poke .cat-lift { animation: cat-poke-lift 10s ease-in-out forwards; }
+.chair .cat.poke .body { animation: cat-poke-arch 10s ease-in-out forwards; }
+.chair .cat.poke .cat-head { animation: cat-poke-head 10s ease-in-out forwards; }
+.chair .cat.poke .eye-open { animation: cat-poke-eyes 10s ease-in-out forwards; }
+.chair .cat.poke .eye-open::after { animation: none; }
+.chair .cat.poke .zz-wrap { animation: cat-poke-zz 10s linear forwards; }
+.chair .cat.poke .tail { animation: cat-poke-tail 10s ease-in-out forwards; }
+@keyframes cat-poke { 0%, 8% { transform: none; opacity: 1; } 12% { transform: scaleX(-1); } 14% { transform: translateX(-16px) scaleX(-1); opacity: 1; }
+  14.5%, 59.5% { transform: translateX(-16px) scaleX(-1); opacity: 0; } 60% { transform: translateX(-16px) scaleX(-1); opacity: 1; }
+  63% { transform: translateX(-16px) scaleX(1); } 67% { transform: translateX(10px) scaleX(1); } 69.5% { transform: translateX(10px) scaleX(-1); }
+  73.5% { transform: translateX(-12px) scaleX(-1); } 76% { transform: translateX(-12px) scaleX(1); } 80% { transform: translateX(6px) scaleX(1); }
+  82.5% { transform: translateX(6px) scaleX(-1); } 85% { transform: translateX(2px) scaleX(1); } 87%, 100% { transform: none; opacity: 1; } }
+@keyframes cat-poke-legs { 0% { scale: 1 0; } 7%, 87% { scale: 1 1; } 95%, 100% { scale: 1 0; } }
+@keyframes cat-poke-lift { 0% { translate: 0 0; } 7%, 60% { translate: 0 -16px; } 65% { translate: 0 -14px; } 67%, 72% { translate: 0 -16px; } 75% { translate: 0 -14px; } 78%, 87% { translate: 0 -16px; } 95%, 100% { translate: 0 0; } }
+@keyframes cat-poke-arch { 0%, 95%, 100% { border-radius: 50% 50% 40% 40%; height: 34px; } 4% { border-radius: 50% 50% 12% 12% / 100% 100% 12% 12%; height: 28px; } 8%, 87% { border-radius: 50% 50% 26% 26% / 90% 90% 22% 22%; height: 30px; } }
+@keyframes cat-poke-head { 0% { transform: none; } 3% { transform: translate(-1px, -6px) rotate(-14deg); } 7%, 87% { transform: translate(-1px, -8px) rotate(-4deg); } 97%, 100% { transform: none; } }
+@keyframes cat-poke-eyes { 0%, 2% { opacity: 0; transform: scale(1, .3); } 5%, 88% { opacity: 1; transform: scale(1, .7); } 93% { opacity: 1; transform: scale(1, .25); } 96%, 100% { opacity: 0; } }
+@keyframes cat-poke-zz { 0%, 98% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes cat-poke-tail { 0%, 4% { rotate: 0deg; } 8%, 60% { rotate: 22deg; } 66% { rotate: 34deg; } 72% { rotate: 18deg; } 78% { rotate: 32deg; } 87% { rotate: 20deg; } 96%, 100% { rotate: 0deg; } }
 .mug { transition: translate .3s ease-out; }
 .mug.teeter { animation: mug-teeter 1.2s ease-in-out; transform-origin: 0 100%; }
 @keyframes mug-teeter { 15% { rotate: -14deg; } 35% { rotate: 8deg; } 55% { rotate: -6deg; } 75% { rotate: 3deg; } 100% { rotate: 0deg; } }
@@ -692,6 +727,9 @@ svg .part { transform-box: fill-box; }
 .box .front { position: absolute; left: 0; right: 0; bottom: 0; height: 74px; background: linear-gradient(180deg, #b98a55, #9c6f3f); border-radius: 2px; box-shadow: 4px 6px 12px rgba(0,0,0,.45); pointer-events: none; display: grid; place-items: center; }
 .box .front::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #8a5f33; }
 .box .front .hand { color: #3a2a17; font-size: 23px; transform: rotate(-3deg); }
+/* a Dirk Fest sticker from Dirk's team, stuck on the box */
+.box .front:has(.sticker) { padding-right: 30px; }  /* the label moves over for it */
+.box .front .sticker { position: absolute; right: 5px; bottom: 5px; width: 34px; height: 34px; border: 1.5px solid #f4f1ea; border-radius: 1px; transform: rotate(7deg); box-shadow: 0 1px 2px rgba(0,0,0,.35); pointer-events: auto; }
 .box .front .hand small { color: #4f3a20; font-size: 18px; }
 .box .flap { position: absolute; bottom: 70px; width: 64px; height: 26px; background: #a77945; pointer-events: none; }
 .box .flap.l { left: -18px; transform: rotate(-24deg); transform-origin: right bottom; }
@@ -896,7 +934,22 @@ svg .part { transform-box: fill-box; }
             <path d="M18 22 L9 21 M18 23.6 L9 24.6 M34 22 L43 21 M34 23.6 L43 24.6" stroke="#f2e2c8" stroke-width=".5"/></svg></div>
           <div class="skirt" aria-hidden="true"></div>
           <div class="leg l" aria-hidden="true"></div><div class="leg r" aria-hidden="true"></div>
-          <div class="cat-paw" aria-hidden="true"></div>
+          <div class="poke-cat" aria-hidden="true"><svg width="80" height="80" viewBox="0 0 80 80">
+            <path class="pc-tail" d="M48 71 Q68 74 69 62 Q70 54 64 52" stroke="#b96d2f" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <path d="M12 73 Q10 46 24 35 Q38 29 48 44 Q57 58 53 73 Z" fill="#c87a3a"/>
+            <ellipse cx="41" cy="60" rx="13" ry="13" fill="#d88a45"/>
+            <ellipse cx="45" cy="72" rx="8" ry="2.6" fill="#b96d2f"/>
+            <rect x="24" y="42" width="6" height="31" rx="3" fill="#b96d2f"/>
+            <g class="pc-head"><path d="M10 18 L11 4 L19 12 Z M23 12 L30 4 L31 17 Z" fill="#c87a3a"/><path d="M12 15 L12.5 8 L16.5 12 Z M25.5 12 L29 8 L29.5 14 Z" fill="#e8a8a0"/>
+              <circle cx="20" cy="23" r="12" fill="#d88a45"/>
+              <ellipse cx="13" cy="27.5" rx="5.5" ry="4" fill="#e9b07a"/>
+              <ellipse cx="15" cy="21" rx="2.6" ry="2.2" fill="#e2c04a"/><ellipse cx="23.5" cy="21" rx="2.6" ry="2.2" fill="#e2c04a"/>
+              <g class="pc-pupils" fill="#1a120c"><ellipse cx="14.4" cy="21" rx=".9" ry="1.9"/><ellipse cx="22.9" cy="21" rx=".9" ry="1.9"/></g>
+              <path d="M12.4 19.6 Q15 18.4 17.6 19.6 M20.9 19.6 Q23.5 18.4 26.1 19.6" stroke="#a8622a" stroke-width="1.1" fill="none"/>
+              <path d="M8.6 25.4 L11 25.4 L9.8 26.8 Z" fill="#e8a8a0"/>
+              <path d="M9 27.5 L1 26 M9 29 L1 30.5" stroke="#f2e2c8" stroke-width=".5"/></g>
+            <g class="pc-paw"><rect x="14.5" y="38" width="7" height="34" rx="3.5" fill="#d88a45"/><ellipse cx="18" cy="71.5" rx="4.6" ry="2.8" fill="#e09a58"/></g>
+          </svg></div>
           <div class="mug" aria-hidden="true"><span class="steam a"></span><span class="steam b"></span></div>
         </div>
         <section class="table-wrap" aria-labelledby="reading-label">
@@ -933,7 +986,7 @@ svg .part { transform-box: fill-box; }
         <div class="box grounded">
           <div class="flap l"></div><div class="flap r"></div>
           <div class="inside" id="stopped"></div>
-          <div class="front"><div class="hand"><a class="shelf-link" href="https://bookwyrm.social/user/drkprmbs/books/stopped-reading" title="Stopped reading, on BookWyrm">Stopped <small id="stopped-count"></small></a></div></div>
+          <div class="front"><img class="sticker" src="art/dirk-fest.webp" width="34" height="34" alt="A Dirk Fest sticker" data-note="Dirk Fest"><div class="hand"><a class="shelf-link" href="https://bookwyrm.social/user/drkprmbs/books/stopped-reading" title="Stopped reading, on BookWyrm">Stopped <small id="stopped-count"></small></a></div></div>
         </div>
       </div>
     </section>
@@ -1435,7 +1488,7 @@ function showNote(el, text) {
   tip.style.left = Math.max(12, Math.min(er.left - rr.left + er.width / 2 - tw / 2, rr.width - tw - 12)) + "px";
   tip.style.top = (er.top - rr.top - th - 12) + "px";
 }
-document.querySelectorAll(".site-link").forEach(a => {
+document.querySelectorAll(".site-link, .sticker").forEach(a => {
   ["mouseenter", "focus"].forEach(ev => a.addEventListener(ev, () => showNote(a, a.dataset.note)));
   ["mouseleave", "blur"].forEach(ev => a.addEventListener(ev, hideTip));
 });
@@ -2195,16 +2248,17 @@ function shakeJar(jar) {
     });
   }, 300);
 }
-function nudgeMug(mug) {  // three quick clicks: the cat reaches over and pushes the mug towards the edge (it never falls)
-  const cat = document.querySelector(".chair .cat"), paw = document.querySelector(".cat-paw");
-  if (catOnSill() || room.classList.contains("storm") || cat.classList.contains("startled")) return replay(mug, "wiggle", 800);
-  replay(paw, "reach", 1500);
-  setTimeout(() => {
-    mug._nudge = Math.min(2, (mug._nudge || 0) + 1);
-    mug.style.translate = -mug._nudge * 4 + "px 0";
+const catBusy = cat => cat.classList.contains("startled") || cat.classList.contains("poke");
+function nudgeMug(mug) {  // three quick clicks: the cat gets up and pats the mug (it never falls); it's hot
+  const cat = document.querySelector(".chair .cat"), sitter = document.querySelector(".poke-cat");
+  if (catOnSill() || room.classList.contains("storm") || catBusy(cat) || reduceMotion) return replay(mug, "wiggle", 800);
+  replay(cat, "poke", 10000); replay(sitter, "poke", 10000);
+  const pat = (at, push) => setTimeout(() => {
+    if (push) { mug._nudge = Math.min(2, (mug._nudge || 0) + 1); mug.style.translate = -mug._nudge * 4 + "px 0"; }
     replay(mug, "teeter", 1200);
-  }, 560);
-  setTimeout(() => noteAt(cat, "aside", ["who, me?", "*innocent*", "oops."][Math.floor(Math.random() * 3)]), 1300);
+  }, at);
+  pat(3450, false); pat(3900, true);
+  setTimeout(() => noteAt(cat.parentElement, "aside",  ["hot!", "ow, hot!", "hot hot hot!"][Math.floor(Math.random() * 3)], 20, 40), 4400);
 }
 function timeLapse() {  // three quick clicks on the clock: a whole day in the window in about ten seconds
   if (sky.lapse || reduceMotion || !sky.shown) return;
@@ -2325,7 +2379,7 @@ function cheerLeaf(leaf, tx, ty) {
   if (brain) setTimeout(() => replay(brain, "wiggle", 800), 200);
   if (train) setTimeout(() => replay(train, "chug", 1900), 350);
   const cat = document.querySelector(".chair .cat");
-  if (cat && !catOnSill() && !room.classList.contains("storm")) replay(cat, "startled", 9100);
+  if (cat && !catOnSill() && !room.classList.contains("storm") && !cat.classList.contains("poke")) replay(cat, "startled", 9100);
   logSee("leaftop");
 }
 room.addEventListener("click", e => {
@@ -2361,7 +2415,7 @@ room.addEventListener("click", e => {
   const sillCat = t.closest(".sill-cat");
   if (sillCat) return replay(sillCat, "look", 1700);
   const cat = t.closest(".cat");
-  if (cat) return replay(cat, "startled", 9100);
+  if (cat) return cat.classList.contains("poke") || replay(cat, "startled", 9100);
   if (t.closest(".lamp")) {
     const lamp = t.closest(".lamp"), n = tally(lamp);
     if (n === 1) lamp._was = [room.classList.contains("lamp-on"), room.classList.contains("lamp-off")];
