@@ -548,45 +548,28 @@ svg .part { transform-box: fill-box; }
 .bookend .owl-pupils { transition: translate .25s ease-in-out; }
 .bookend.hoot .owl-pupils { animation: owl-look 1.6s ease-in-out; }
 @keyframes owl-look { 0%, 100% { translate: 0 0; } 20%, 40% { translate: -2px 0; } 60%, 80% { translate: 2px 0; } }
-/* three clicks on the mug: the cat gets up, turns, sits facing the mug, tilts her head and pats it
-   twice; it's hot, so she shakes her paw, turns round a few times and lies down again. 10s in all.
-   The lying cat does the getting up and the circling; .poke-cat is her sitting, patting self. */
+/* three clicks on the mug: the cat is sitting facing it, tilts her head and pats it twice; it's hot,
+   so she shakes her paw, looks round to see who saw, and is back asleep. 7s in all.
+   .poke-cat is her sitting self; the lying cat just steps aside meanwhile. */
 .poke-cat { display: none; position: absolute; left: 30px; top: 60px; z-index: 4; pointer-events: none; opacity: 0; }
 .poke-cat svg { display: block; overflow: visible; }
 .poke-cat .pc-paw { transform-origin: 18px 40px; }
 .poke-cat .pc-head { transform-origin: 22px 34px; }
-.poke-cat.poke { display: block; animation: pc-show 10s linear forwards; }
-.poke-cat.poke .pc-head { animation: pc-head 10s ease-in-out forwards; }
-.poke-cat.poke .pc-paw { animation: pc-paw 10s ease-in-out forwards; }
-.poke-cat.poke .pc-pupils { animation: pc-pupils 10s ease-in-out forwards; }
+.poke-cat.poke { display: block; animation: pc-show 7s linear forwards; }
+.poke-cat.poke .pc-head { animation: pc-head 7s ease-in-out forwards; }
+.poke-cat.poke .pc-paw { animation: pc-paw 7s ease-in-out forwards; }
+.poke-cat.poke .pc-pupils { animation: pc-pupils 7s ease-in-out forwards; }
 .room.cat-out .poke-cat, .room.hubert .poke-cat { display: none; }
-@keyframes pc-show { 0%, 14% { opacity: 0; } 14.5%, 59.5% { opacity: 1; } 60%, 100% { opacity: 0; } }
-@keyframes pc-head { 0%, 18% { rotate: 0deg; } 23%, 28% { rotate: -16deg; } 31%, 42% { rotate: 12deg; } 46%, 52% { rotate: 10deg; } 57%, 100% { rotate: 0deg; } }
-@keyframes pc-paw { 0%, 28% { rotate: 0deg; } 32% { rotate: 136deg; } 34.5% { rotate: 150deg; } 36.5% { rotate: 134deg; } 39% { rotate: 150deg; } 41% { rotate: 136deg; }
-  44% { rotate: 50deg; } 45.5% { rotate: 70deg; } 47% { rotate: 40deg; } 48.5% { rotate: 70deg; } 50% { rotate: 40deg; } 51.5% { rotate: 66deg; } 53% { rotate: 44deg; } 56%, 100% { rotate: 0deg; } }
-@keyframes pc-pupils { 0%, 43% { scale: 1 1; } 44%, 52% { scale: 1.3 .5; } 56%, 100% { scale: 1 1; } }
-/* the lying cat: up lazily, turn to the mug (then she sits, above), back, round and round, down */
-.chair .cat.poke { animation: cat-poke 10s ease-in-out forwards; }
-.chair .cat.poke .cat-legs i { animation: cat-poke-legs 10s ease-in-out forwards; }
-.chair .cat.poke .cat-lift { animation: cat-poke-lift 10s ease-in-out forwards; }
-.chair .cat.poke .body { animation: cat-poke-arch 10s ease-in-out forwards; }
-.chair .cat.poke .cat-head { animation: cat-poke-head 10s ease-in-out forwards; }
-.chair .cat.poke .eye-open { animation: cat-poke-eyes 10s ease-in-out forwards; }
-.chair .cat.poke .eye-open::after { animation: none; }
-.chair .cat.poke .zz-wrap { animation: cat-poke-zz 10s linear forwards; }
-.chair .cat.poke .tail { animation: cat-poke-tail 10s ease-in-out forwards; }
-@keyframes cat-poke { 0%, 8% { transform: none; opacity: 1; } 12% { transform: scaleX(-1); } 14% { transform: translateX(-16px) scaleX(-1); opacity: 1; }
-  14.5%, 59.5% { transform: translateX(-16px) scaleX(-1); opacity: 0; } 60% { transform: translateX(-16px) scaleX(-1); opacity: 1; }
-  63% { transform: translateX(-16px) scaleX(1); } 67% { transform: translateX(10px) scaleX(1); } 69.5% { transform: translateX(10px) scaleX(-1); }
-  73.5% { transform: translateX(-12px) scaleX(-1); } 76% { transform: translateX(-12px) scaleX(1); } 80% { transform: translateX(6px) scaleX(1); }
-  82.5% { transform: translateX(6px) scaleX(-1); } 85% { transform: translateX(2px) scaleX(1); } 87%, 100% { transform: none; opacity: 1; } }
-@keyframes cat-poke-legs { 0% { scale: 1 0; } 7%, 87% { scale: 1 1; } 95%, 100% { scale: 1 0; } }
-@keyframes cat-poke-lift { 0% { translate: 0 0; } 7%, 60% { translate: 0 -16px; } 65% { translate: 0 -14px; } 67%, 72% { translate: 0 -16px; } 75% { translate: 0 -14px; } 78%, 87% { translate: 0 -16px; } 95%, 100% { translate: 0 0; } }
-@keyframes cat-poke-arch { 0%, 95%, 100% { border-radius: 50% 50% 40% 40%; height: 34px; } 4% { border-radius: 50% 50% 12% 12% / 100% 100% 12% 12%; height: 28px; } 8%, 87% { border-radius: 50% 50% 26% 26% / 90% 90% 22% 22%; height: 30px; } }
-@keyframes cat-poke-head { 0% { transform: none; } 3% { transform: translate(-1px, -6px) rotate(-14deg); } 7%, 87% { transform: translate(-1px, -8px) rotate(-4deg); } 97%, 100% { transform: none; } }
-@keyframes cat-poke-eyes { 0%, 2% { opacity: 0; transform: scale(1, .3); } 5%, 88% { opacity: 1; transform: scale(1, .7); } 93% { opacity: 1; transform: scale(1, .25); } 96%, 100% { opacity: 0; } }
-@keyframes cat-poke-zz { 0%, 98% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes cat-poke-tail { 0%, 4% { rotate: 0deg; } 8%, 60% { rotate: 22deg; } 66% { rotate: 34deg; } 72% { rotate: 18deg; } 78% { rotate: 32deg; } 87% { rotate: 20deg; } 96%, 100% { rotate: 0deg; } }
+@keyframes pc-show { 0% { opacity: 0; } 3%, 88% { opacity: 1; } 92%, 100% { opacity: 0; } }
+@keyframes pc-head { 0%, 4% { rotate: 0deg; } 8%, 14% { rotate: -16deg; } 17%, 34% { rotate: 12deg; } 38% { rotate: 0deg; } 42%, 52% { rotate: 10deg; } 57%, 59% { rotate: 0deg; }
+  63%, 67% { rotate: -8deg; } 72%, 76% { rotate: 7deg; } 81%, 100% { rotate: 0deg; } }
+@keyframes pc-paw { 0%, 17% { rotate: 0deg; } 20% { rotate: 136deg; } 23% { rotate: 150deg; } 26% { rotate: 134deg; } 29% { rotate: 150deg; } 32% { rotate: 136deg; }
+  36% { rotate: 50deg; } 38% { rotate: 70deg; } 40% { rotate: 40deg; } 42% { rotate: 70deg; } 44% { rotate: 40deg; } 46% { rotate: 66deg; } 48% { rotate: 44deg; } 52%, 100% { rotate: 0deg; } }
+@keyframes pc-pupils { 0%, 35% { scale: 1 1; translate: 0 0; } 37%, 50% { scale: 1.3 .5; } 54%, 59% { scale: 1 1; translate: 0 0; } 63%, 67% { translate: -1.3px 0; } 72%, 76% { translate: 1.3px 0; } 81%, 100% { translate: 0 0; } }
+.chair .cat.poke { animation: cat-poke 7s linear forwards; }
+.chair .cat.poke .zz-wrap { animation: cat-poke-zz 7s linear forwards; }
+@keyframes cat-poke { 0% { opacity: 1; } 3%, 88% { opacity: 0; } 92%, 100% { opacity: 1; } }
+@keyframes cat-poke-zz { 0%, 95% { opacity: 0; } 100% { opacity: 1; } }
 .mug { transition: translate .3s ease-out; }
 .mug.teeter { animation: mug-teeter 1.2s ease-in-out; transform-origin: 0 100%; }
 @keyframes mug-teeter { 15% { rotate: -14deg; } 35% { rotate: 8deg; } 55% { rotate: -6deg; } 75% { rotate: 3deg; } 100% { rotate: 0deg; } }
@@ -2249,16 +2232,16 @@ function shakeJar(jar) {
   }, 300);
 }
 const catBusy = cat => cat.classList.contains("startled") || cat.classList.contains("poke");
-function nudgeMug(mug) {  // three quick clicks: the cat gets up and pats the mug (it never falls); it's hot
+function nudgeMug(mug) {  // three quick clicks: the cat sits up and pats the mug (it never falls); it's hot
   const cat = document.querySelector(".chair .cat"), sitter = document.querySelector(".poke-cat");
   if (catOnSill() || room.classList.contains("storm") || catBusy(cat) || reduceMotion) return replay(mug, "wiggle", 800);
-  replay(cat, "poke", 10000); replay(sitter, "poke", 10000);
+  replay(cat, "poke", 7000); replay(sitter, "poke", 7000);
   const pat = (at, push) => setTimeout(() => {
     if (push) { mug._nudge = Math.min(2, (mug._nudge || 0) + 1); mug.style.translate = -mug._nudge * 4 + "px 0"; }
     replay(mug, "teeter", 1200);
   }, at);
-  pat(3450, false); pat(3900, true);
-  setTimeout(() => noteAt(cat.parentElement, "aside",  ["hot!", "ow, hot!", "hot hot hot!"][Math.floor(Math.random() * 3)], 20, 40), 4400);
+  pat(1610, false); pat(2030, true);
+  setTimeout(() => noteAt(cat.parentElement, "aside", ["hot!", "ow, hot!", "hot hot hot!"][Math.floor(Math.random() * 3)], 20, 40), 2500);
 }
 function timeLapse() {  // three quick clicks on the clock: a whole day in the window in about ten seconds
   if (sky.lapse || reduceMotion || !sky.shown) return;
