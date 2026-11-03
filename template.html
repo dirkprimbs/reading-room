@@ -559,7 +559,8 @@ svg .part { transform-box: fill-box; }
 .poke-cat.poke { display: block; animation: pc-show 7s linear forwards; }
 .poke-cat.poke .pc-head { animation: pc-head 7s ease-in-out forwards; }
 .poke-cat.poke .pc-paw { animation: pc-paw 7s ease-in-out forwards; }
-.poke-cat.poke .pc-pupils { animation: pc-pupils 7s ease-in-out forwards; }
+.poke-cat .pc-pupils ellipse { transform-box: fill-box; transform-origin: center; }  /* squint in place, not towards the SVG origin */
+.poke-cat.poke .pc-pupils ellipse { animation: pc-pupils 7s ease-in-out forwards; }
 .room.cat-out .poke-cat, .room.hubert .poke-cat { display: none; }
 @keyframes pc-show { 0% { opacity: 0; } 3%, 92.8% { opacity: 1; } 95.7%, 100% { opacity: 0; } }
 @keyframes pc-head { 0%, 4% { rotate: 0deg; } 8%, 14% { rotate: -16deg; } 17%, 34% { rotate: 12deg; } 38% { rotate: 0deg; } 42%, 52% { rotate: 10deg; } 57%, 59% { rotate: 0deg; }
@@ -937,7 +938,7 @@ svg .part { transform-box: fill-box; }
               <g class="pc-pupils" fill="#1a120c"><ellipse cx="14.4" cy="21" rx=".9" ry="1.9"/><ellipse cx="22.9" cy="21" rx=".9" ry="1.9"/></g>
               <path d="M12.4 19.6 Q15 18.4 17.6 19.6 M20.9 19.6 Q23.5 18.4 26.1 19.6" stroke="#a8622a" stroke-width="1.1" fill="none"/>
               <path d="M8.6 25.4 L11 25.4 L9.8 26.8 Z" fill="#e8a8a0"/>
-              <path d="M9 27.5 L1 26 M9 29 L1 30.5" stroke="#f2e2c8" stroke-width=".5"/></g>
+              <path d="M9 27.5 L1 26 M9 29 L1 30.5 M30.6 27 L37.5 26 M30.2 28.6 L37.5 30" stroke="#f2e2c8" stroke-width=".5"/></g>
             <g class="pc-paw"><rect x="14.5" y="38" width="7" height="34" rx="3.5" fill="#d88a45"/><ellipse cx="18" cy="71.5" rx="4.6" ry="2.8" fill="#e09a58"/></g>
           </svg></div>
           <div class="mug" aria-hidden="true"><span class="steam a"></span><span class="steam b"></span></div>
