@@ -4,4 +4,6 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 SITE="${SITE:-$HOME/Documents/websites/primbs.ca/public_static/reading-room}"
-python3 -I build.py --out "$SITE" --self-host-fonts --preview-controls   # panel hidden (type "brain")
+LOGS="${LOGS:-$HOME/Documents/websites/podlogs/logs}"   # the web server's access logs, for the visitor count
+visits=(); [ -d "$LOGS" ] && visits=(--visits "$LOGS")
+python3 -I build.py --out "$SITE" --self-host-fonts --preview-controls "${visits[@]}"   # panel hidden (type "brain")

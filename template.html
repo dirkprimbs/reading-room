@@ -666,6 +666,7 @@ svg .part { transform-box: fill-box; }
 .logbook:focus-visible { outline: 2px solid var(--lamp); outline-offset: 2px; }
 .card.logdlg[open] { display: block; width: min(600px, calc(100vw - 32px)); }
 .logdlg h2 { margin: 0; font-size: 34px; color: #4a2d18; }
+.log-count { margin: 4px 0 6px; font-size: 22px; color: #4a2d18; }
 .log-sub { margin: 2px 0 14px; font-size: 14px; color: #7a6450; }
 .log-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
 .log-list li { display: grid; grid-template-columns: 46px 1fr; gap: 8px; align-items: center; min-height: 46px; }
@@ -1007,7 +1008,7 @@ svg .part { transform-box: fill-box; }
   <footer class="credits">Shelves from <a href="https://bookwyrm.social/user/drkprmbs">bookwyrm.social/user/drkprmbs</a>, <span id="built"></span>.<span id="wx-credit"></span> Code on <a href="https://github.com/dirkprimbs/reading-room">GitHub</a>.</footer>
   <dialog class="card logdlg" id="logdlg" aria-labelledby="log-title">
     <button class="card-close" id="log-close" type="button" aria-label="Close">&times;</button>
-    <div><h2 class="hand" id="log-title">Visitors' log</h2><p class="log-sub">Who has come by, and what has happened, while the room was open in this browser.</p>
+    <div><h2 class="hand" id="log-title">Visitors' log</h2><p class="log-count hand" id="log-count" hidden></p><p class="log-sub">Who has come by, and what has happened, while the room was open in this browser.</p>
     <ul class="log-list" id="log-list"></ul></div>
   </dialog>
   <dialog class="card" id="card" aria-labelledby="card-title">
@@ -1039,6 +1040,7 @@ svg .part { transform-box: fill-box; }
 
 <script>
 const DATA = __DATA__;
+const VISITS = __VISITS__;
 const BASE = "https://bookwyrm.social";
 const CLOTH = ["#7b2d26", "#2f4f4f", "#5b3a29", "#3d5a3d", "#8a6a2f", "#2c3e5c", "#6b4c6b", "#a0522d", "#4a4a3a", "#8c3b3b", "#1f5c5c", "#c19a5b", "#3a2e4f", "#556b2f", "#9c8463", "#d6c4a0", "#283c3c", "#b5653a", "#e0d2b4", "#5d1f2e"];
 
@@ -1404,6 +1406,13 @@ for (let p = 0; p < nPiles; p++) {
 }
 
 // counts
+// the visitor count, worked out from the web server's logs when the page was built (see --visits)
+if (VISITS) {
+  const el = document.getElementById("log-count");
+  const since = new Date(VISITS.since + "T12:00").toLocaleDateString("en-CA", { day: "numeric", month: "long" });
+  el.textContent = VISITS.n.toLocaleString("en-CA") + (VISITS.n === 1 ? " visitor has" : " visitors have") + " looked in since " + since + ".";
+  el.hidden = false;
+}
 document.getElementById("built").textContent = new Date(DATA.built + "T12:00").toLocaleDateString("en-CA", { day: "numeric", month: "long", year: "numeric" });
 document.getElementById("read-count").textContent = "· " + DATA.read.length;  // includes the Canadiana wall shelf, like the shelf on BookWyrm
 document.getElementById("cn-count").textContent = "· " + DATA.read.filter(b => b.cn).length + " read";

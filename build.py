@@ -375,7 +375,40 @@ def collect(cache, export, refresh_descriptions=False, out_dir=None):
     return s
 
 
-def render(page, data):
+LOG_LINE = re.compile(r'\[(\d\d)/(\w{3})/(\d{4}):[^\]]*\] "GET (/reading-room\S*) [^"]*" (\d{3}) \S+ "[^"]*" "([^"]*)"')
+LOG_BOTS = re.compile(r"bot|crawl|spider|slurp|scrapy|curl|wget|python|http-client|go-http|libwww|okhttp|java/|headless|"
+                      r"phantom|monitor|uptime|checker|fetch|feed|rss|preview|validator|archive|scanner|"
+                      r"facebookexternalhit|whatsapp|telegram|discord|slack", re.I)
+MONTHS = {m: i for i, m in enumerate(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
+
+
+def count_visits(log_dir, host="primbs_ca"):
+    """Browser-days on the reading room from the web server's access logs (access_log_<host>_<date>.gz).
+
+    The host anonymises IPs, so a visitor is one user agent on one day. It counts only if
+    that browser loaded the page (200/304) AND some of the room's fonts or pictures the same
+    day: the scrapers that fake referrers with ordinary browser names never fetch assets.
+    Returns {"n": count, "since": first day} or None if there are no logs.
+    """
+    import glob, gzip
+    pages, assets = set(), set()
+    for path in sorted(glob.glob(os.path.join(log_dir, f"access_log_{host}_*.gz"))):
+        with gzip.open(path, "rt", encoding="utf-8", errors="replace") as f:
+            for line in f:
+                m = LOG_LINE.search(line)
+                if not m or m.group(5) not in ("200", "304") or LOG_BOTS.search(m.group(6)):
+                    continue
+                key = (f"{m.group(3)}-{MONTHS.get(m.group(2), 0):02d}-{m.group(1)}", m.group(6))
+                is_page = re.fullmatch(r"/reading-room(/|/index\.html)?(\?.*)?", m.group(4))
+                (pages if is_page else assets).add(key)
+    seen = pages & assets
+    if not seen:
+        return None
+    return {"n": len(seen), "since": min(d for d, _ in seen)}
+
+
+def render(page, data, visits=None):
+    page = page.replace("__VISITS__", json.dumps(visits))
     return page.replace("__DATA__", json.dumps(data, ensure_ascii=False).replace("</", "<\\/"))
 
 
@@ -394,6 +427,8 @@ def main():
     p.add_argument("--refresh-descriptions", action="store_true",
                    help="fetch every book's record and cover again instead of using the cached ones")
     p.add_argument("--offline", action="store_true", help="use the BookWyrm pages already in the cache (no fetching)")
+    p.add_argument("--visits", metavar="LOG_DIR",
+                   help="count visitors from the web server's access logs in LOG_DIR and show the number in the visitors' log")
     a = p.parse_args()
     global OFFLINE
     OFFLINE = a.offline
@@ -417,16 +452,22 @@ def main():
     for name in os.listdir(art):
         with open(os.path.join(art, name), "rb") as f:
             write_if_changed(os.path.join(out, "art", name), f.read())
+    visits = count_visits(os.path.expanduser(a.visits)) if a.visits else None
     index = os.path.join(out, "index.html")
-    # the footer date says when the shelves last changed, not when the script last ran, so
-    # a rebuild without news leaves index.html untouched and a deploy has nothing to upload
+    # the footer date says when the shelves last changed, not when the script last ran (nor
+    # when the visitor count moved), so a rebuild without news leaves index.html untouched
+    # and a deploy has nothing to upload
     if os.path.exists(index):
         with open(index, encoding="utf-8") as f:
             current = f.read()
         before = re.search(r'"built": "(\d{4}-\d\d-\d\d)"', current)
-        if before and render(page, {**data, "built": before.group(1)}) == current:
+        old_visits = re.search(r"^const VISITS = (.*);$", current, re.M)
+        old_visits = json.loads(old_visits.group(1)) if old_visits else None
+        if before and render(page, {**data, "built": before.group(1)}, old_visits) == current:
             data["built"] = before.group(1)
-    write_if_changed(index, render(page, data).encode())
+    write_if_changed(index, render(page, data, visits).encode())
+    if visits:
+        print("visitors:", visits["n"], "since", visits["since"])
     books = [b for v in data.values() if isinstance(v, list) for b in v]
     print({k: len(v) for k, v in data.items() if isinstance(v, list)},
           "rated:", sum(1 for b in books if b.get("r")), "reviewed:", sum(1 for b in books if b.get("v")),
