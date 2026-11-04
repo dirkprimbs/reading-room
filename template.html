@@ -414,13 +414,17 @@ svg .part { transform-box: fill-box; }
 .cat { left: 56px; top: 92px; width: 100px; height: 40px; z-index: 3; }  /* in front of the book on the armrest when she stands up */
 .cat .body { position: absolute; left: 0; bottom: 0; width: 82px; height: 34px; border-radius: 50% 50% 40% 40%; background: linear-gradient(180deg, #d88a45, #b96d2f); }
 .cat .head { position: absolute; right: 2px; bottom: 4px; width: 32px; height: 28px; border-radius: 50%; background: #d88a45; }
+/* whiskers, two a side: each a short line with its twin drawn as a shadow, fanned slightly */
+.cat .head::before, .cat .head::after { content: ""; position: absolute; top: 19px; width: 10px; height: .6px; background: #f2e2c8; box-shadow: 0 2.6px 0 #f2e2c8; }
+.cat .head::before { left: -6px; rotate: 6deg; }
+.cat .head::after { right: -6px; rotate: -6deg; }
 .cat .ear { position: absolute; bottom: 24px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 11px solid #c87a3a; }
 .cat .ear.a { right: 6px; }
 .cat .ear.b { right: 20px; transform: rotate(-12deg); }
 .cat .eye { position: absolute; bottom: 15px; width: 7px; height: 2px; border-radius: 2px; background: #3a2414; }
 .cat .eye.a { right: 8px; }
 .cat .eye.b { right: 20px; }
-.cat .tail { position: absolute; transform-origin: 100% 100%; left: -12px; bottom: -2px; width: 46px; height: 18px; border: 6px solid #b96d2f; border-top: 0; border-right: 0; border-radius: 0 0 0 20px; }
+.cat .tail { position: absolute; transform-origin: 100% 100%; left: -12px; bottom: 5px; width: 22px; height: 20px; border: 6px solid #b96d2f; border-top: 0; border-right: 0; border-radius: 0 0 0 14px; }  /* from her rump, curling up behind her */
 .cat .zz-wrap { position: absolute; right: 30px; bottom: 30px; width: 30px; height: 40px; z-index: 5; pointer-events: none; }
 .cat .zz { position: absolute; left: 0; bottom: 0; font-family: var(--font-hand); font-weight: 700; color: #efe2c8; font-size: 17px; opacity: 0; animation: zz-float 4.2s ease-out infinite; }
 .cat .zz.z2 { font-size: 20px; animation-delay: 1.4s; }
@@ -938,7 +942,7 @@ svg .part { transform-box: fill-box; }
               <g class="pc-pupils" fill="#1a120c"><ellipse cx="14.4" cy="21" rx=".9" ry="1.9"/><ellipse cx="22.9" cy="21" rx=".9" ry="1.9"/></g>
               <path d="M12.4 19.6 Q15 18.4 17.6 19.6 M20.9 19.6 Q23.5 18.4 26.1 19.6" stroke="#a8622a" stroke-width="1.1" fill="none"/>
               <path d="M8.6 25.4 L11 25.4 L9.8 26.8 Z" fill="#e8a8a0"/>
-              <path d="M9 27.5 L1 26 M9 29 L1 30.5 M30.6 27 L37.5 26 M30.2 28.6 L37.5 30" stroke="#f2e2c8" stroke-width=".5"/></g>
+              <path d="M9 27.5 L1 26 M9 29 L1 30.5 M17 27.5 L35.5 26.2 M17 29 L35.5 30.3" stroke="#f2e2c8" stroke-width=".5"/></g>
             <g class="pc-paw"><rect x="14.5" y="38" width="7" height="34" rx="3.5" fill="#d88a45"/><ellipse cx="18" cy="71.5" rx="4.6" ry="2.8" fill="#e09a58"/></g>
           </svg></div>
           <div class="mug" aria-hidden="true"><span class="steam a"></span><span class="steam b"></span></div>
