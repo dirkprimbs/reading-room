@@ -446,6 +446,9 @@ def main():
             preview = f.read()
     page = page.replace("__PREVIEW__", preview)
     page = page.replace("__WEATHER_URL__", "null" if a.no_weather else json.dumps(WEATHER_URL))
+    # the QR code on each card is drawn in the browser by Kazuhiko Arase's qrcode-generator (MIT)
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendor", "qrcode-generator-2.0.4.js")) as f:
+        page = page.replace("__QRCODE__", f.read().replace("</", "<\\/"))
     # the room's own pictures (the Dirk Fest sticker)
     art = os.path.join(os.path.dirname(os.path.abspath(__file__)), "art")
     os.makedirs(os.path.join(out, "art"), exist_ok=True)

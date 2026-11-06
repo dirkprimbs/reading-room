@@ -821,9 +821,15 @@ svg .part { transform-box: fill-box; }
 .card-copy:focus-visible { outline: 2px solid #8a3b2b; outline-offset: 2px; }
 .card-link { justify-self: start; padding: 8px 14px; border-radius: 3px; background: #2a1d12; color: var(--lamp); text-decoration: none; font-weight: 700; }
 .card-link:hover, .card-link:focus-visible { background: #4a3322; outline: 2px solid var(--lamp); outline-offset: 2px; }
+.card-qr { margin: 18px 0 0; width: 150px; text-align: center; }
+.card-qr[hidden] { display: none; }
+.card-qr svg { display: block; width: 116px; height: 116px; margin: 0 auto; padding: 6px; background: #fffaf0; border-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,.18); shape-rendering: crispEdges; }
+.card-qr figcaption { margin-top: 6px; font-size: 13.5px; color: #7a6450; }
 @media (max-width: 560px) {
   .card[open] { grid-template-columns: 1fr; }
-  .card-art { position: static; }
+  .card-art { position: static; display: flex; align-items: flex-end; gap: 18px; }
+  .card-qr { margin: 0; width: 110px; }
+  .card-qr svg { width: 96px; height: 96px; }
   .card-cover { width: 120px; }
   .card-cover-img { width: 120px; }
 }
@@ -1023,6 +1029,7 @@ svg .part { transform-box: fill-box; }
     <div class="card-art">
       <img class="card-cover-img" id="card-cover-img" alt="" hidden>
       <div class="card-cover" aria-hidden="true"><span class="cc-title"></span><span class="cc-author"></span></div>
+      <figure class="card-qr" id="card-qr" hidden><svg role="img" aria-label="QR code with a link to this book"></svg><figcaption>Scan to open this book</figcaption></figure>
     </div>
     <div class="card-body">
       <div class="card-shelf hand"></div>
@@ -1045,6 +1052,7 @@ svg .part { transform-box: fill-box; }
   <div class="tip" id="tip" role="tooltip"><div class="t"></div><div class="a"></div><div class="f"></div><div class="r"></div><div class="h"></div><div class="v"></div><div class="s"></div></div>
 </main>
 
+<script>__QRCODE__</script>
 <script>
 const DATA = __DATA__;
 const VISITS = __VISITS__;
@@ -1503,6 +1511,23 @@ if (norbert) {
   ["mouseleave", "blur"].forEach(ev => norbert.addEventListener(ev, hideTip));
 }
 const card = document.getElementById("card");
+function bookLink(b) { return location.origin + location.pathname + "#book-" + b.id; }
+// a QR code for the book's link, so someone across the room can open it on their phone;
+// only for http(s) pages (a file:// preview has no link worth scanning)
+function drawQR(url) {
+  const fig = document.getElementById("card-qr");
+  fig.hidden = !/^https?:/.test(url) || typeof qrcode !== "function";
+  if (fig.hidden) return;
+  const qr = qrcode(0, "M");  // smallest version that fits; M recovers ~15% damage
+  qr.addData(url);
+  qr.make();
+  const n = qr.getModuleCount(), q = 2;  // 2-module quiet zone, plus the svg's padding
+  let d = "";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) d += `M${c + q} ${r + q}h1v1h-1z`;
+  const svg = fig.querySelector("svg");
+  svg.setAttribute("viewBox", `0 0 ${n + 2 * q} ${n + 2 * q}`);
+  svg.innerHTML = `<path d="${d}" fill="#2a1d12"/>`;
+}
 function stars(r) {
   return r ? "\u2605".repeat(Math.round(r)) + "<span>" + "\u2605".repeat(5 - Math.round(r)) + "</span>" : "";
 }
@@ -1537,6 +1562,7 @@ function openCard(el) {
   card._from = el;
   document.getElementById("card-copy").textContent = "Copy a link to this book";
   history.replaceState(null, "", "#book-" + b.id);  // the address now points at this book
+  drawQR(bookLink(b));
   card.showModal();
   card.scrollTop = 0;
   more.hidden = !b.d || desc.scrollHeight <= desc.clientHeight + 2;  // only when the text is cut off
@@ -1556,7 +1582,7 @@ card.addEventListener("close", () => {
 document.getElementById("card-copy").addEventListener("click", async e => {
   const button = e.currentTarget;
   try {
-    await navigator.clipboard.writeText(location.origin + location.pathname + "#book-" + card._from._book.id);
+    await navigator.clipboard.writeText(bookLink(card._from._book));
     button.textContent = "Link copied";
   } catch (err) {
     button.textContent = "Copy the address from the address bar";
