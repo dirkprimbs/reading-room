@@ -8,7 +8,7 @@ A cozy-living-room page of Dirk's BookWyrm shelves (bookwyrm.social/user/drkprmb
 
 ## How it's built
 
-`build.py` fetches the public shelf pages and the ActivityPub outbox (ratings, reviews, "finished reading" dates) into `downloads/`, merges them, and fills `template.html` with the data. The result is one self-contained `index.html`, plus a `fonts/` folder when `--self-host-fonts` is set. No server-side code; the page can't update itself because BookWyrm doesn't allow cross-site requests.
+`build.py` fetches the public shelf pages and the ActivityPub outbox (ratings, reviews, "finished reading" dates) into `downloads/`, merges them, and fills `template.html` with the data. The result is one self-contained `index.html`, plus a `fonts/` folder when `--self-host-fonts` is set. No server-side code; the page can't update itself because BookWyrm doesn't allow cross-site requests. A tab left open does pick up the daily rebuild, though: once an hour it sends a HEAD request for its own `index.html` and reloads if the ETag changed (not while a card is open or someone touched the room in the last minute).
 
 A book counts as read when it is on the Read shelf or has a finish date (from the "finished reading" posts in the outbox), unless it is currently on Reading, To read or Stopped. A finished book wins over another edition of it on To read. Canadiana is a topic label only.
 

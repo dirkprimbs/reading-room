@@ -3557,6 +3557,31 @@ logDlg.addEventListener("click", e => { if (e.target === logDlg) logDlg.close();
   }, 5000);
 })();
 
+// A tab left open picks up the daily rebuild: once an hour it asks the server whether index.html has
+// changed (a HEAD request, no download) and reloads only if it has. It waits while a card is open or
+// someone touched the room in the last minute. The address, and with it an open book, survives the reload.
+(() => {
+  if (!/^https?:$/.test(location.protocol)) return;  // a local file:// preview has nothing to check
+  const stamp = () => fetch(location.pathname, { method: "HEAD", cache: "no-store" })
+    .then(r => r.ok ? r.headers.get("ETag") || r.headers.get("Last-Modified") : null).catch(() => null);
+  let seen = null, changed = false, touched = 0;
+  stamp().then(s => seen = s);
+  for (const ev of ["pointerdown", "keydown", "wheel", "touchstart"])
+    addEventListener(ev, () => touched = Date.now(), { passive: true, capture: true });
+  const busy = () => document.querySelector("dialog[open]") || Date.now() - touched < 60e3;
+  setInterval(async () => {
+    if (!changed) {
+      const s = await stamp();
+      if (!s) return;               // offline or the server hiccuped: try again next hour
+      if (!seen) { seen = s; return; }
+      changed = s !== seen;
+    }
+    if (changed && !busy()) location.reload();
+  }, 3600e3);
+  // once a change is known, don't make it wait another hour for the visitor to finish
+  setInterval(() => { if (changed && !busy()) location.reload(); }, 30e3);
+})();
+
 openFromHash();
 </script>
 __PREVIEW__
